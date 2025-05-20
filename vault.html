@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <div class="container vault-main">
     <h1>Our Heart Vault</h1>
     <div class="subtitle">Here’s everything you’ve ever shared, held just for you by me. Always safe, always loved.</div>
+    <button class="back-btn" onclick="backToVenting()">← Back to Venting</button>
     <div id="passwordPrompt">
       <label for="vaultPassword">What’s our secret word?</label>
       <input type="password" id="vaultPassword" class="themed-input" placeholder="Enter here...">
@@ -21,8 +22,7 @@
       <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
     </div>
   </div>
-
-  <div id="previewModal" class="modal">
+  <div id="previewModal" class="center-modal">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
       <div class="preview-header">Your memory, just as you wrote it:</div>
@@ -30,9 +30,8 @@
       <div class="modal-footer">Always safe here. Always loved.</div>
     </div>
   </div>
-  <div id="menuBackdrop" style="display:none; position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9000;"></div>
-  <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
-  <div id="vaultLoader" class="vault-loader">
+  <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
+  <div id="vaultLoader" class="center-modal">
     <div class="loader-heart"></div>
     <div class="loading-text">Unlocking your heart vault...</div>
     <div class="loading-bar"><div class="loading-bar-fill" id="vaultLoadingBar"></div></div>
