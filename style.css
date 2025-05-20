@@ -162,19 +162,27 @@ select:focus, input[type="password"]:focus {
   line-height: 1.35;
 }
 
-/* Loader Ribbon Centered Modal */
-.center-modal {
+/* Loader Ribbon Centered Modal - FIXED FOR UNIVERSAL CENTERING */
+.center-modal,
+.custom-modal,
+#loadingCard,
+#vaultLoader {
   display: none;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  z-index: 50000;
-  top: 0; left: 0;
+  position: fixed !important;
+  left: 0;
+  top: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(255, 202, 232, 0.19);
+  z-index: 50000;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 202, 232, 0.19) !important;
+  transition: background .18s;
 }
-.center-modal.active {
+.center-modal.active,
+#loadingCard.active,
+#vaultLoader.active,
+.custom-modal.active {
   display: flex !important;
 }
 .ribbon-loader-box {
@@ -184,43 +192,63 @@ select:focus, input[type="password"]:focus {
   justify-content: center;
   background: #fff6fa;
   border-radius: 24px;
-  padding: 32px 32px 24px 32px;
   box-shadow: 0 5px 29px #eab5e7bb;
-  min-width: 230px;
-  min-height: 112px;
+  padding: 30px 25px 20px 25px;
+  min-width: 180px;
+  min-height: 105px;
   position: relative;
+  text-align: center;
 }
 .ribbon {
   font-family: 'Pacifico', cursive;
   color: #e055ab;
-  font-size: 20px;
+  font-size: 17.5px;
   background: #ffd6ec;
-  border-radius: 15px;
-  padding: 7px 18px;
-  margin-bottom: 18px;
+  border-radius: 14px;
+  padding: 8px 20px;
+  margin-bottom: 17px;
+  margin-top: 4px;
   box-shadow: 0 1px 7px #ffd6e9;
   display: inline-block;
+  letter-spacing: 0.12px;
 }
 .ribbon-loader-circ {
-  width: 41px;
-  height: 41px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  border: 6px solid #ffbde2;
-  border-top: 6px solid #7bcfae;
-  animation: spinribbon 1s linear infinite;
-  margin-bottom: 4px;
-  position: relative;
+  border: 5px solid #ffbde2;
+  border-top: 5px solid #7bcfae;
+  animation: spinribbon 0.95s linear infinite;
   background: none;
+  margin-bottom: 2px;
+  margin-top: 3px;
+  transition: background 0.3s;
 }
 .ribbon-loader-circ.done {
-  border: 6px solid #b0f5cb;
-  border-top: 6px solid #7bcfae;
+  border: 5px solid #a2eaa3;
+  border-top: 5px solid #a2eaa3;
+  background: url("data:image/svg+xml;utf8,<svg width='36' height='36' xmlns='http://www.w3.org/2000/svg'><circle cx='18' cy='18' r='18' fill='%23a2eaa3'/><polyline points='9,19 16,27 28,13' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/80% no-repeat #a2eaa3;
   animation: none;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 52 52' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='26' cy='26' r='25' stroke='%2392e1b3' stroke-width='3'/%3E%3Cpath d='M15 27l7 7 15-15' stroke='%2348be7f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/29px no-repeat;
 }
 @keyframes spinribbon {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
+  to { transform: rotate(360deg); }
+}
+/* Make sure modal content is always visually centered (fixes top-shift on mobile) */
+.center-modal .modal-content,
+.custom-modal .modal-content,
+.center-modal .ribbon-loader-box {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+@media (max-width: 600px) {
+  .ribbon-loader-box {
+    min-width: 100px;
+    padding: 17px 4vw 13px 4vw;
+  }
+  .ribbon {
+    font-size: 15.3px;
+    padding: 7px 10px;
+  }
 }
 
 /* Custom Modal Alert */
