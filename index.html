@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container" id="ventContainer">
+  <div class="container">
     <h1>Hey Nayu, I'm always here for you 💗</h1>
     <div class="subtitle">This space is all yours, built just for you by Tish. Feel free to open up, or get comforted below.</div>
     <div class="countdowns">
@@ -25,6 +25,7 @@
         <div class="countdown-timer" id="countRel"></div>
       </div>
     </div>
+
     <label for="mood">How are you feeling right now?</label>
     <select id="mood">
       <option value="Overwhelmed">Overwhelmed</option>
@@ -37,6 +38,7 @@
       <option value="Angry">Angry</option>
       <option value="Other">Other</option>
     </select>
+
     <label for="vent" style="margin-bottom:2px;">Let it out, I'm listening.</label>
     <div class="toolbar">
       <button type="button" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
@@ -53,21 +55,17 @@
     <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="Type anything. Style it, make it yours. I love every word."></div>
     <button class="big-btn" onclick="submitVent()">Send My Feelings</button>
     <p class="info love-message">Everything here is private and just for us. I’m proud of you, always. 💖</p>
-    <button class="vault-btn" onclick="openVaultWindow()">Open Our Vault</button>
-    <button class="comfort-btn" onclick="openComfortCorner()">Open Comfort Corner</button>
+    <button class="vault-btn" onclick="window.location.href='vault.html'">Open Our Vault</button>
+    <button class="comfort-btn" onclick="window.location.href='comfort.html'">Open Comfort Corner</button>
   </div>
 
-  <!-- Loading and modal popups -->
+  <!-- Centered loading and info modals -->
   <div id="loadingCard" class="center-modal">
     <div class="loader-heart"></div>
     <div class="loading-text">Sending to your vault...</div>
     <div class="loading-bar"><div class="loading-bar-fill" id="progressBar"></div></div>
   </div>
   <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
-  <div id="vaultWindow" class="center-modal vault-window"></div>
-  <div id="comfortModal" class="center-modal comfort-window"></div>
-
-  <!-- Activities Modal/Window is now only in comfortModal -->
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
