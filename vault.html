@@ -2,40 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nayu’s Private Vault — Just For Us</title>
+  <title>Tish’s Heart Vault — For Nayu Only</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <script>window.scrollTo(0,0);</script>
   <div class="container">
-    <h1>Our Heart Vault</h1>
-    <div class="subtitle">Here’s everything you’ve ever shared, held just for you by me. Always safe, always loved.</div>
-    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Venting</button>
+    <h1>Every Little Piece of You</h1>
+    <div class="subtitle">All your memories are here, locked in my vault forever. Only you can open it. 💗</div>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Write More to Tish</button>
     <div id="passwordPrompt">
-      <label for="vaultPassword">What’s our secret word?</label>
-      <input type="password" id="vaultPassword" class="themed-input" placeholder="Enter here...">
-      <button onclick="unlockVault()" class="big-btn" id="unlockBtn">Unlock Vault</button>
+      <label for="vaultPassword" class="pink-label">Type our secret word:</label>
+      <input type="password" id="vaultPassword" class="themed-input" placeholder="Shhh...">
+      <button onclick="unlockVault()" class="big-btn" id="unlockBtn">Open My Heart Vault</button>
     </div>
     <div id="vaultSection" style="display: none;">
-      <div class="vault-list-title">All Your Feelings, Right Here:</div>
+      <div class="vault-list-title">Your Memories:</div>
       <div class="vault-list" id="ventList"></div>
-      <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
+      <button onclick="deleteAllVents()" class="delete-btn">Delete All</button>
     </div>
   </div>
-
   <div id="previewModal" class="modal">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
-      <div class="preview-header">Your memory, just as you wrote it:</div>
+      <div class="preview-header">Here’s what you wrote, precious:</div>
       <div id="modalText" class="preview-body"></div>
-      <div class="modal-footer">Always safe here. Always loved.</div>
+      <div class="modal-footer">Kept safe, always. 💖</div>
     </div>
   </div>
   <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
   <div id="vaultLoader" class="center-modal">
-    <div class="loader-heart"></div>
-    <div class="loading-text">Unlocking your heart vault...</div>
-    <div class="loading-bar"><div class="loading-bar-fill" id="vaultLoadingBar"></div></div>
+    <div class="ribbon-loader-box">
+      <span class="ribbon">Unlocking your vault...</span>
+      <div class="ribbon-loader-circ" id="vaultRibbonCirc"></div>
+    </div>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
