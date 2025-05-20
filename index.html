@@ -2,32 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tish’s Cozy Nayu-Safe Space</title>
+  <title>Nayu’s Cozy Corner 🌷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <script>window.scrollTo(0,0);</script>
   <div class="container">
-    <h1>Welcome, beautiful Nayu 💗</h1>
-    <div class="subtitle">You can pour out anything here, and I’ll keep it safe, always. Love, Tish.</div>
+    <h1>Hi baby, tell me anything 💗</h1>
+    <div class="subtitle">Your words are safe here, with Tish. Let it out or pick something comforting below!</div>
     <div class="countdowns">
       <div class="countdown-card" id="nayuBday">
         <div class="countdown-title">Your Birthday</div>
         <div class="countdown-timer" id="countNayu"></div>
       </div>
       <div class="countdown-card" id="tishBday">
-        <div class="countdown-title">My Birthday</div>
+        <div class="countdown-title">Tish’s Birthday</div>
         <div class="countdown-timer" id="countTish"></div>
       </div>
       <div class="countdown-card" id="relCounter">
-        <div class="countdown-title">We’ve Been Us</div>
+        <div class="countdown-title">Together since</div>
         <div class="countdown-timer" id="countRel"></div>
       </div>
     </div>
 
-    <label for="mood" class="pink-label">How’s your heart feeling right now?</label>
+    <label for="mood" class="pink-label">How are you feeling right now?</label>
     <select id="mood">
       <option value="Overwhelmed">Overwhelmed</option>
       <option value="Exhausted">Exhausted</option>
@@ -40,7 +40,7 @@
       <option value="Other">Other</option>
     </select>
 
-    <label for="vent" class="pink-label" style="margin-bottom:2px;">Type anything here, I’ll keep it safe for you forever.</label>
+    <label for="vent" class="pink-label" style="margin-bottom:2px;">I’m listening, type your feelings below:</label>
     <div class="toolbar">
       <button type="button" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
       <button type="button" onclick="formatDoc('italic')" title="Italic"><i>I</i></button>
@@ -54,20 +54,37 @@
       </select>
     </div>
     <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="I'll keep it safe for you forever."></div>
-    <button class="big-btn" onclick="submitVent()">Send it to Tish’s vault</button>
-    <p class="info love-message">Only you and Tish will ever see what you write. Love always. 💖</p>
-    <button class="vault-btn" onclick="window.location.href='vault.html'">See All Your Memories</button>
-    <button class="comfort-btn" onclick="window.location.href='comfort.html'">Go To Comfort Corner</button>
-  </div>
+    <button class="big-btn" onclick="submitVent()">Send it to Tish’s Vault</button>
+    <p class="info love-message">Everything here is private, just for you and me. You’re my favorite person, always. 💖</p>
+    
+    <!-- Loader Modal -->
+    <div id="loadingCard" class="center-modal">
+      <div class="ribbon-loader-box">
+        <div class="ribbon">Sending to your vault...</div>
+        <div class="ribbon-loader-circ" id="mainRibbonCirc"></div>
+      </div>
+    </div>
+    <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
 
-  <div id="loadingCard" class="center-modal">
-    <div class="ribbon-loader-box">
-      <span class="ribbon">Sending to your vault...</span>
-      <div class="ribbon-loader-circ" id="mainRibbonCirc"></div>
+    <button class="vault-btn" onclick="window.location.href='vault.html'">Open The Heart Vault</button>
+    <button class="comfort-btn" onclick="window.location.href='comfort.html'">Go to Comfort Corner</button>
+  </div>
+  
+  <!-- Comfort Activities Popups (modals for breathing and cat) -->
+  <div id="breathingModal" class="center-modal">
+    <div class="modal-content glassy-modal">
+      <span class="close-button" onclick="closeBreathing()">&times;</span>
+      <div class="breath-circle" id="breathCircle"></div>
+      <div class="breath-instruct" id="breathInstruct">Ready?</div>
     </div>
   </div>
-  <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
-
+  <div id="catModal" class="center-modal">
+    <div class="modal-content glassy-modal cat-content">
+      <span class="close-button" onclick="closeCat()">&times;</span>
+      <div id="theCat"></div>
+      <div id="catMsg" class="cat-msg"></div>
+    </div>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
