@@ -1,0 +1,88 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+h1, h2 {
+  text-align: center;
+  color: #333;
+}
+
+label {
+  display: block;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+select, textarea, input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  background-color: #4b72ff;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #365bd3;
+}
+
+#ventList {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+#ventList li {
+  background: #f0f0f0;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ventHeader {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.info {
+  margin-top: 15px;
+  font-style: italic;
+  color: #666;
+  font-size: 14px;
+}
