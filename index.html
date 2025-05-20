@@ -1,172 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Vent Here, Nayu</title>
-  <style>
-    /* Base Styles */
-    body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f8;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      padding: 25px 30px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 25px;
-      font-weight: 700;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 15px;
-    }
-    select, textarea {
-      width: 100%;
-      padding: 12px 15px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 14px;
-      resize: vertical;
-      transition: border-color 0.3s ease;
-    }
-    select:focus, textarea:focus {
-      border-color: #007BFF;
-      outline: none;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-bottom: 10px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .info {
-      font-size: 13px;
-      color: #666;
-      margin-top: 8px;
-      text-align: center;
-    }
-
-    /* Overlay and loader styles (assuming same as your vault styles) */
-    #overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.4);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    #loader {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #007BFF;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin-bottom: 15px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    #successMessage {
-      display: none;
-      color: #007BFF;
-      text-align: center;
-      font-weight: 700;
-      font-size: 18px;
-    }
-    .checkmark {
-      font-size: 40px;
-      margin-bottom: 8px;
-    }
-
-    /* Vault button styling */
-    .vault-btn {
-      margin-top: 20px;
-      background-color: #444;
-    }
-    .vault-btn:hover {
-      background-color: #222;
-    }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      .container {
-        margin: 10px;
-        padding: 20px;
-      }
-      button {
-        font-size: 18px;
-      }
-      select, textarea {
-        font-size: 16px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Nayu’s Soft Place (by Your Boyfriend)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
   <div class="container">
-    <h1>It's okay, let it out — you're safe here!</h1>
-
-    <label for="mood">Your mood right now:</label>
+    <h1>Nayu’s Cozy Corner</h1>
+    <div class="subtitle">You’re safe here with me. Tell me how you really feel.</div>
+    <label for="mood">What’s on your heart today?</label>
     <select id="mood">
-      <option value="Insecure">🫥 Insecure</option>
-      <option value="Overthinking">🤯 Overthinking</option>
-      <option value="Doubtful">😶‍🌫️ Doubtful</option>
-      <option value="Confronting">🧍 Confronting</option>
-      <option value="Complaining">🙄 Complaining</option>
-      <option value="Burnt Out">😩 Burnt Out</option>
-      <option value="Masking">🙃 Masking</option>
-      <option value="Angry">😤 Angry</option>
-      <option value="Blank">😐 Blank</option>
+      <option value="Overwhelmed">Overwhelmed</option>
+      <option value="Exhausted">Exhausted</option>
+      <option value="Anxious">Anxious</option>
+      <option value="Lost">Lost</option>
+      <option value="Tired of Pretending">Tired of Pretending</option>
+      <option value="Heavy-Hearted">Heavy-Hearted</option>
+      <option value="Numb">Numb</option>
+      <option value="Angry">Angry</option>
+      <option value="Other">Other</option>
     </select>
+    <label for="vent">Let it out. I’m listening, always. (Only I will see this, promise.)</label>
+    <textarea id="vent" rows="7" placeholder="Write anything. No judgment. Just you, just me."></textarea>
+    <button class="big-btn" onclick="submitVent()">Send My Feelings</button>
+    <p class="info love-message">Your words are safe with me, always.<br>I’m proud of you for sharing your heart. 💖</p>
 
-    <label for="vent">What’s on your mind?</label>
-    <textarea id="vent" rows="10" placeholder="Type it here..."></textarea>
-
-    <button onclick="submitVent()">Submit</button>
-    <p class="info">Everything you say here is just for me to understand better. You're safe.</p>
-
-    <!-- Loading and success overlay -->
+    <!-- Visual Loading/Success -->
     <div id="overlay">
-      <div id="loader"></div>
+      <div id="heart-loader" class="hide"></div>
       <div id="successMessage">
-        <div class="checkmark">&#10003;</div>
-        <p>Successfully Vented!</p>
+        <div class="sent-heart">💕</div>
+        <p class="affirmation">You’ve let go of a little heaviness.<br>I’m holding it for you now.<br>Love you, Nayu.</p>
       </div>
     </div>
 
-    <!-- Vault Access Button -->
-    <button class="vault-btn" onclick="window.location.href='vault.html'">🔒 Open Vault</button>
+    <button class="vault-btn" onclick="window.location.href='vault.html'">See Our Heart Vault</button>
   </div>
-
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
