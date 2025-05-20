@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nayu’s Comfort Corner (By Tish)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>Comfort Corner</h1>
+    <div class="subtitle">Take a breath, pet Bixie, or let the compliments rain down. Everything here is for your peace.</div>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Venting</button>
+    <div class="comfort-content">
+      <div class="activities">
+        <button onclick="startBreathing()" class="activity-btn">Breathe With Me</button>
+        <button onclick="complimentRain()" class="activity-btn">Shower Compliments</button>
+        <button onclick="petTheCat()" class="activity-btn">Pet Bixie</button>
+      </div>
+      <div id="breathingModal" class="center-modal">
+        <div class="modal-content">
+          <span class="close-button" onclick="closeBreathing()">&times;</span>
+          <div class="breath-circle" id="breathCircle"></div>
+          <div class="breath-instruct" id="breathInstruct">Ready?</div>
+        </div>
+      </div>
+      <div id="catModal" class="center-modal">
+        <div class="modal-content cat-content">
+          <span class="close-button" onclick="closeCat()">&times;</span>
+          <div id="theCat"></div>
+          <div id="catMsg" class="cat-msg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
+  <script src="script.js"></script>
+</body>
+</html>
