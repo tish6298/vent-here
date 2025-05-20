@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container vault-main">
+  <div class="container">
     <h1>Our Heart Vault</h1>
     <div class="subtitle">Here’s everything you’ve ever shared, held just for you by me. Always safe, always loved.</div>
-    <button class="back-btn" onclick="backToVenting()">← Back to Venting</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Venting</button>
     <div id="passwordPrompt">
       <label for="vaultPassword">What’s our secret word?</label>
       <input type="password" id="vaultPassword" class="themed-input" placeholder="Enter here...">
@@ -22,7 +22,8 @@
       <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
     </div>
   </div>
-  <div id="previewModal" class="center-modal">
+
+  <div id="previewModal" class="modal">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
       <div class="preview-header">Your memory, just as you wrote it:</div>
