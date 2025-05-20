@@ -11,42 +11,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-window.onload = function() {
-  window.scrollTo(0, 0);
-};
-
-// --- Loader Ribbon ---
-function showRibbonLoader(msg, circId) {
-  const modal = document.getElementById(circId === "vaultRibbonCirc" ? "vaultLoader" : "loadingCard");
-  if (!modal) return;
-  modal.classList.add('active');
-  let ribbon = modal.querySelector('.ribbon');
-  if (ribbon) ribbon.innerText = msg;
-  let circ = modal.querySelector('.ribbon-loader-circ');
-  if (circ) {
-    circ.classList.remove('done');
-    circ.style.background = '';
-  }
-}
-function hideRibbonLoader(circId, successText) {
-  const modal = document.getElementById(circId === "vaultRibbonCirc" ? "vaultLoader" : "loadingCard");
-  if (!modal) return;
-  let circ = modal.querySelector('.ribbon-loader-circ');
-  if (circ) circ.classList.add('done');
-  let ribbon = modal.querySelector('.ribbon');
-  if (ribbon && successText) ribbon.innerText = successText;
-  setTimeout(() => {
-    modal.classList.remove('active');
-    if (circ) circ.classList.remove('done');
-    if (ribbon && successText) ribbon.innerText = '';
-  }, 850);
-}
+// --- Custom Modal Alert ---
 function showCustomModal(msg) {
   const modal = document.getElementById('customModal');
   if (modal) {
-    modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" class="big-btn">OK</button>';
+    modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" class="big-btn" style="width:90%;margin-top:15px;">OK</button>';
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
+  } else {
+    alert(msg); // fallback
   }
 }
 function closeCustomModal() {
@@ -70,23 +43,25 @@ if (document.getElementById("vent")) {
 }
 
 // --- VENT SUBMISSION ---
-let ventDisabled = false;
 function submitVent() {
-  if (ventDisabled) return;
   const moodElem = document.getElementById("mood");
   const ventElem = document.getElementById("vent");
   if (!moodElem || !ventElem) return;
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal("Write a little more for me? I want to know you better.");
+    showCustomModal("Type a little more? I want to hear you.");
     return;
   }
-  ventDisabled = true;
-  showRibbonLoader("Sending to your vault...", "mainRibbonCirc");
-  const btn = document.querySelector(".big-btn");
-  if (btn) btn.disabled = true;
-
+  // Show loader modal
+  const loading = document.getElementById("loadingCard");
+  const circ = document.getElementById("mainRibbonCirc");
+  if (loading) {
+    loading.classList.add("active");
+    if (circ) circ.classList.remove("done");
+    document.body.style.overflow = "hidden";
+  }
+  // Save to Firestore (with encryption)
   const date = new Date().toLocaleString();
   const preview = ventElem.innerText.split(" ").slice(0, 18).join(" ") + (ventElem.innerText.split(" ").length > 18 ? "..." : "");
   const entry = { date, mood, preview, fullText: text };
@@ -97,17 +72,16 @@ function submitVent() {
       encrypted,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      hideRibbonLoader("mainRibbonCirc", "Saved with love!");
-      ventElem.innerHTML = '';
-      if (btn) btn.disabled = false;
+      if (circ) circ.classList.add("done");
       setTimeout(()=>{
-        showCustomModal("It’s safe with me now. Thank you for trusting me, sweetheart 💗");
-        ventDisabled = false;
+        loading.classList.remove("active");
+        document.body.style.overflow = "";
+        ventElem.innerHTML = '';
+        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗");
       }, 800);
     }).catch(err => {
-      hideRibbonLoader("mainRibbonCirc");
-      if (btn) btn.disabled = false;
-      ventDisabled = false;
+      loading.classList.remove("active");
+      document.body.style.overflow = "";
       showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small>");
     });
   });
@@ -150,22 +124,29 @@ function decryptText(base64, password) {
 // --- VAULT ACCESS ---
 function unlockVault() {
   const inputElem = document.getElementById("vaultPassword");
+  const loader = document.getElementById("vaultLoader");
+  const circ = document.getElementById("vaultRibbonCirc");
   if (!inputElem) return;
   const inputPassword = inputElem.value;
-  const btn = document.getElementById("unlockBtn");
-  if (btn) btn.disabled = true;
   if (inputPassword !== "tishcancode") {
-    showCustomModal("Oops, not the secret word! Try again, love.");
-    if (btn) btn.disabled = false;
+    showCustomModal("That’s not our secret word… try again?");
     return;
   }
-  showRibbonLoader("Unlocking your vault...", "vaultRibbonCirc");
+  // Show loader
+  if (loader) {
+    loader.classList.add("active");
+    if (circ) circ.classList.remove("done");
+    document.body.style.overflow = "hidden";
+  }
   setTimeout(()=>{
-    hideRibbonLoader("vaultRibbonCirc", "Unlocked!");
-    document.getElementById("passwordPrompt").style.display = "none";
-    document.getElementById("vaultSection").style.display = "block";
-    loadVaultEntries(inputPassword);
-    if (btn) btn.disabled = false;
+    if (circ) circ.classList.add("done");
+    setTimeout(()=>{
+      loader.classList.remove("active");
+      document.body.style.overflow = "";
+      document.getElementById("passwordPrompt").style.display = "none";
+      document.getElementById("vaultSection").style.display = "block";
+      loadVaultEntries(inputPassword);
+    }, 700);
   }, 800);
 }
 window.unlockVault = unlockVault;
@@ -177,12 +158,12 @@ function loadVaultEntries(password) {
   db.collection("nayuVault").orderBy("timestamp", "desc").get()
     .then(querySnapshot => {
       if (querySnapshot.empty) {
-        list.innerHTML = "<div class='vault-card' style='text-align:center;'>Nothing here yet. I’ll hold every memory close for you, promise. 💖</div>";
+        list.innerHTML = "<div class='vault-card' style='text-align:center;'>No notes yet, but I’m always here when you need me.</div>";
         return;
       }
       querySnapshot.forEach(doc => {
         const entryEnc = doc.data().encrypted;
-        decryptText(entryEnc, "tishcancode").then(decrypted => {
+        decryptText(entryEnc, password).then(decrypted => {
           const data = JSON.parse(decrypted);
           list.appendChild(createVaultCard(data, doc.id));
         }).catch(() => {});
@@ -194,6 +175,7 @@ function createVaultCard(data, docId) {
   const card = document.createElement("div");
   card.className = "vault-card";
   card.dataset.docId = docId;
+  // Main content
   const contentDiv = document.createElement("div");
   contentDiv.className = "vault-card-content";
   const header = document.createElement("div");
@@ -201,6 +183,7 @@ function createVaultCard(data, docId) {
   header.textContent = `${data.date} — [${data.mood}]`;
   contentDiv.appendChild(header);
 
+  // Dots Menu
   const menuBtn = document.createElement("button");
   menuBtn.className = "menu-dots";
   menuBtn.innerHTML = "&#x22EE;";
@@ -216,6 +199,7 @@ function createVaultCard(data, docId) {
   menuPopup.querySelector(".menu-read").onclick = e => {
     showModal(data.fullText);
     menuPopup.style.display = "none";
+    document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
   };
   menuPopup.querySelector(".menu-download").onclick = e => {
@@ -223,69 +207,88 @@ function createVaultCard(data, docId) {
     safeFilename = safeFilename.replace(/[\s?<>\\:*|"]/g, '_');
     downloadText(data.fullText, safeFilename);
     menuPopup.style.display = "none";
+    document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
   };
   menuPopup.querySelector(".menu-delete").onclick = e => {
-    showCustomModal("Delete this memory forever?<br><br><button onclick='confirmDeleteOne(\""+docId+"\")' class='big-btn'>Delete It</button>");
+    showCustomModal(`<span>Are you sure you want to delete this memory?</span><br><br><button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>`);
     menuPopup.style.display = "none";
+    document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
   };
   menuBtn.onclick = function(e) {
     document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
-    menuPopup.style.display = menuPopup.style.display === "block" ? "none" : "block";
+    document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
+    const backdrop = document.getElementById("menuBackdrop");
+    if (menuPopup.style.display === "block") {
+      menuPopup.style.display = "none";
+      menuBtn.classList.remove("active");
+      if (backdrop) backdrop.style.display = "none";
+    } else {
+      menuPopup.style.display = "block";
+      menuBtn.classList.add("active");
+      if (backdrop) backdrop.style.display = "block";
+      menuPopup.style.left = "auto";
+    }
     e.stopPropagation();
   };
+  const backdrop = document.getElementById("menuBackdrop");
+  if (backdrop) {
+    backdrop.onclick = function() {
+      document.querySelectorAll(".menu-popup").forEach(m => m.style.display="none");
+      document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
+      backdrop.style.display = "none";
+    };
+  }
   card.appendChild(contentDiv);
   card.appendChild(menuBtn);
   card.appendChild(menuPopup);
   return card;
 }
-window.confirmDeleteOne = function(docId) {
+window.confirmDeleteSingle = function(docId) {
   closeCustomModal();
-  db.collection("nayuVault").doc(docId).delete().then(()=>{
-    showCustomModal("Deleted that memory. But I’ll remember the love!");
-    setTimeout(()=>location.reload(),800);
-  });
+  db.collection("nayuVault").doc(docId).delete().then(() => {
+    showCustomModal("Deleted! I’m always here for your next note.");
+    setTimeout(()=>location.reload(),1200);
+  }).catch(err => showCustomModal("Error deleting: " + err.message));
 };
 
 function deleteAllVents() {
-  showCustomModal("Delete every memory? This can’t be undone.<br><br><button onclick='confirmDeleteAll()' class='big-btn'>Delete All</button>");
+  showCustomModal("Are you sure you want to delete all your memories? This can’t be undone.<br><br><button onclick='confirmDeleteAll()' class='delete-btn'>Yes, delete all</button>");
 }
 window.deleteAllVents = deleteAllVents;
+window.deleteAllEntries = deleteAllVents;
+
 function confirmDeleteAll() {
   closeCustomModal();
-  db.collection("nayuVault").get().then(snapshot=>{
-    let batch = db.batch();
-    snapshot.docs.forEach(doc=>{
-      batch.delete(doc.ref);
-    });
+  db.collection("nayuVault").get().then((querySnapshot) => {
+    const batch = db.batch();
+    querySnapshot.forEach((doc) => batch.delete(doc.ref));
     return batch.commit();
-  }).then(()=>{
-    showCustomModal("All gone. You can write more whenever you want, love.");
+  }).then(() => {
+    showCustomModal("Everything deleted. I’ll be here for your next secret anytime.");
     setTimeout(()=>location.reload(),1200);
-  });
+  }).catch(err => showCustomModal("Error deleting: " + err.message));
 }
+window.confirmDeleteAll = confirmDeleteAll;
 
-// --- Modal for reading ---
+// --- MODAL FOR ENTRY READING ---
 function showModal(text) {
   const modal = document.getElementById("previewModal");
   const modalText = document.getElementById("modalText");
   if (modal && modalText) {
     modalText.innerHTML = text;
     modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
   }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
     document.getElementById("previewModal").style.display = "none";
-    document.body.style.overflow = "";
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
       modal.style.display = "none";
-      document.body.style.overflow = "";
     }
   };
 }
@@ -309,116 +312,14 @@ if (document.getElementById("vaultPassword")) {
 }
 
 // --- Activities / Games ---
-function petTheCat() {
-  const catModal = document.getElementById("catModal");
-  const theCat = document.getElementById("theCat");
-  const catMsg = document.getElementById("catMsg");
-  if (!catModal || !theCat || !catMsg) return;
-  catModal.style.display = "flex";
-  catMsg.textContent = "Tap Bixie’s nose to pet!";
-  theCat.innerHTML = `
-    <svg viewBox="0 0 90 90" width="95" height="95" fill="none">
-      <ellipse cx="45" cy="49" rx="36" ry="34" fill="#ffcb88"/>
-      <ellipse cx="23" cy="33" rx="9" ry="13" fill="#ffe7c2"/>
-      <ellipse cx="67" cy="33" rx="9" ry="13" fill="#ffe7c2"/>
-      <ellipse cx="45" cy="55" rx="23" ry="16" fill="#fff7ee"/>
-      <ellipse cx="32" cy="37" rx="3" ry="7" fill="#fff4d2"/>
-      <ellipse cx="58" cy="37" rx="3" ry="7" fill="#fff4d2"/>
-      <ellipse cx="37" cy="47" rx="3" ry="6" fill="#a77a45"/>
-      <ellipse cx="53" cy="47" rx="3" ry="6" fill="#a77a45"/>
-      <ellipse cx="45" cy="61" rx="6" ry="3" fill="#fff"/>
-      <ellipse cx="45" cy="51" rx="3" ry="2" fill="#b97234"/>
-      <ellipse cx="45" cy="59" rx="5" ry="2.1" fill="#ffcb88"/>
-      <ellipse cx="45" cy="47.5" rx="2" ry="1.4" fill="#fff"/>
-      <ellipse cx="45" cy="54" rx="2" ry="1.2" fill="#fff"/>
-      <ellipse cx="45" cy="52.3" rx="2" ry="1.1" fill="#fff"/>
-      <ellipse cx="45" cy="54.5" rx="1.3" ry="0.7" fill="#fff"/>
-      <ellipse id="bixieNose" cx="45" cy="54" rx="2.5" ry="2" fill="#ed9d64" style="cursor:pointer;"/>
-      <path d="M44 57 Q45 58.8,46 57" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
-      <path d="M32 53 Q28 54,32 56" stroke="#a77a45" stroke-width="1.2" fill="none"/>
-      <path d="M58 53 Q62 54,58 56" stroke="#a77a45" stroke-width="1.2" fill="none"/>
-      <ellipse class="bixie-blink" cx="37" cy="47" rx="1.3" ry="1.7" fill="#4a3010"/>
-      <ellipse class="bixie-blink" cx="53" cy="47" rx="1.3" ry="1.7" fill="#4a3010"/>
-    </svg>
-  `;
-  let purrs = [
-    "Bixie purrs and rubs her face on you!",
-    "She closes her eyes and smiles.",
-    "Bixie blinks and you feel loved.",
-    "She makes a happy little mew!"
-  ];
-  let times = 0;
-  theCat.querySelector("#bixieNose").onclick = function() {
-    catMsg.textContent = purrs[times % purrs.length];
-    times++;
-    theCat.style.transform = "scale(1.07)";
-    setTimeout(()=>{theCat.style.transform="";},170);
-  }
-  window.closeCat = ()=>{catModal.style.display="none";};
-}
-window.petTheCat = petTheCat;
-
-// --- Compliment Rain (slower, pop, blocks BG, disables interaction while active) ---
-let complimentRainActive = false;
-function complimentRain() {
-  if (complimentRainActive) return;
-  complimentRainActive = true;
-  const blockDiv = document.createElement("div");
-  blockDiv.style.position = "fixed";
-  blockDiv.style.top = 0;
-  blockDiv.style.left = 0;
-  blockDiv.style.width = "100vw";
-  blockDiv.style.height = "100vh";
-  blockDiv.style.zIndex = 14999;
-  blockDiv.style.background = "rgba(255,255,255,0.01)";
-  document.body.appendChild(blockDiv);
-
-  const compliments = [
-    "You are enough.", "You’re so strong.", "Your feelings are valid.",
-    "You make my world softer.", "I love your heart.", "I’m proud of you.",
-    "It’s okay to rest.", "You shine even on rough days.", "You are loved.",
-    "Your smile makes everything lighter.", "You matter to me, always.", "You can be soft here.",
-    "It's okay to be sad.", "You are never a burden.", "Tish will always listen."
-  ];
-  let total = 13, popped = 0, rainSpeed = 3600, delay = 290;
-  for (let i=0; i<total; ++i) {
-    setTimeout(()=>{
-      let el = document.createElement("div");
-      el.className = "compliment-bubble";
-      el.textContent = compliments[Math.floor(Math.random()*compliments.length)];
-      el.style.left = (6 + Math.random()*88) + "vw";
-      el.style.top = "-40px";
-      document.body.appendChild(el);
-      let end = 90 + Math.random()*13;
-      let anim = el.animate([
-        {top:"-40px", opacity:1, transform:"scale(1.07)"},
-        {top:end+"vh", opacity:0.6, transform:"scale(1.13) rotate(-4deg)"}
-      ], {duration: rainSpeed+Math.random()*1200, easing:"ease-in"});
-      el.onclick = function() {
-        el.classList.add("popped");
-        setTimeout(()=>{el.remove();},190);
-        popped++;
-        if (popped===total) finishRain();
-      };
-      setTimeout(()=>{if(el)el.classList.add("popped");if(el)el.remove(); popped++; if (popped===total) finishRain();}, rainSpeed+1400);
-    }, i*delay);
-  }
-  function finishRain() {
-    document.body.removeChild(blockDiv);
-    complimentRainActive = false;
-  }
-}
-window.complimentRain = complimentRain;
-
-// --- Breathe Modal ---
 function startBreathing() {
   const modal = document.getElementById("breathingModal");
   const instruct = document.getElementById("breathInstruct");
   const circle = document.getElementById("breathCircle");
   if (!modal) return;
-  modal.style.display = "flex";
+  modal.classList.add("active");
   let steps = [
-    {txt:"Breathe In", time: 3500, scale:1.23, color:"#fa8dc0"},
+    {txt:"Breathe In", time: 3500, scale:1.21, color:"#fa8dc0"},
     {txt:"Hold", time: 2000, scale:1.13, color:"#f7bff0"},
     {txt:"Breathe Out", time: 4000, scale:0.99, color:"#96d1ea"},
     {txt:"Hold", time: 1700, scale:1.08, color:"#ffd2ef"}
@@ -433,10 +334,90 @@ function startBreathing() {
     setTimeout(() => { i=(i+1)%steps.length; nextStep(); }, steps[i].time);
   }
   nextStep();
-  modal.onclick = function(e) { if(e.target===modal){ active=false; modal.style.display="none"; } };
-  window.closeBreathing = () => { active=false; modal.style.display="none"; };
+  modal.onclick = function(e) { if(e.target===modal){ active=false; modal.classList.remove("active"); } };
+  window.closeBreathing = () => { active=false; modal.classList.remove("active"); };
 }
 window.startBreathing = startBreathing;
+
+function complimentRain() {
+  const compliments = [
+    "You are enough.", "You’re so strong.", "Your feelings are valid.",
+    "You make my world softer.", "I love your heart.", "I’m proud of you.",
+    "It’s okay to rest.", "You shine even on rough days.", "You are loved."
+  ];
+  let complimentCount = 13;
+  let rainDuration = 3300; // ms for the longest bubble
+  for (let i=0; i<complimentCount; ++i) {
+    setTimeout(()=>{
+      let el = document.createElement("div");
+      el.className = "compliment-bubble";
+      el.textContent = compliments[Math.floor(Math.random()*compliments.length)];
+      el.style.left = (8 + Math.random()*82) + "vw";
+      el.style.top = "-50px";
+      document.body.appendChild(el);
+      let end = 100 + Math.random()*15;
+      el.animate([
+        {top:"-50px", opacity:1, transform:"scale(1.05)"},
+        {top:end+"vh", opacity:1, transform:"scale(1.17)"},
+        {top:end+"vh", opacity:0, transform:"scale(1.26)"}
+      ], {duration:rainDuration, easing:"ease-in"});
+      // popping interaction
+      el.onclick = () => {
+        el.classList.add("popped");
+        setTimeout(()=>{if(el)el.remove();}, 250);
+      };
+      setTimeout(()=>{if(el)el.remove();}, rainDuration+160);
+    }, i*300);
+  }
+  // Prevent button spam:
+  document.body.style.pointerEvents = "none";
+  setTimeout(() => { document.body.style.pointerEvents = ""; }, complimentCount * 300 + rainDuration + 200);
+}
+window.complimentRain = complimentRain;
+
+// --- Pet Bixie (cat face) ---
+function petTheCat() {
+  const catModal = document.getElementById("catModal");
+  const theCat = document.getElementById("theCat");
+  const catMsg = document.getElementById("catMsg");
+  if (!catModal || !theCat || !catMsg) return;
+  catModal.classList.add("active");
+  catMsg.textContent = "Tap Bixie to pet!";
+  theCat.innerHTML = `
+    <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+      <ellipse cx="48" cy="53" rx="38" ry="32" fill="#ffe7c2"/>
+      <ellipse cx="29" cy="43" rx="10" ry="13" fill="#ffb564"/>
+      <ellipse cx="67" cy="43" rx="10" ry="13" fill="#ffb564"/>
+      <ellipse cx="48" cy="53" rx="26" ry="23" fill="#fff7ee"/>
+      <ellipse cx="48" cy="53" rx="16" ry="13" fill="#ffd17b"/>
+      <ellipse cx="48" cy="63" rx="11" ry="7" fill="#ffb564"/>
+      <ellipse cx="43" cy="43" rx="2" ry="4" fill="#ffcf92"/>
+      <ellipse cx="53" cy="43" rx="2" ry="4" fill="#ffcf92"/>
+      <ellipse cx="44" cy="56" rx="2" ry="3" fill="#8e5c26"/>
+      <ellipse cx="52" cy="56" rx="2" ry="3" fill="#8e5c26"/>
+      <ellipse cx="48" cy="59" rx="3" ry="1.2" fill="#fff"/>
+      <ellipse cx="48" cy="61" rx="1.1" ry="0.7" fill="#c97b2b"/>
+      <path d="M46 62 Q48 64,50 62" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
+      <ellipse cx="48" cy="60.5" rx="1.2" ry="1" fill="#c97b2b"/>
+      <path d="M44 51 Q48 56,52 51" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
+      <!-- Ears -->
+      <polygon points="18,28 25,45 31,36" fill="#ffb564"/>
+      <polygon points="78,28 71,45 65,36" fill="#ffb564"/>
+    </svg>
+  `;
+  let purrs = [
+    "Bixie purrs and rubs you!", "She closes her eyes, so happy!", "She loves your gentle touch!", "Bixie does a tiny happy dance."
+  ];
+  let times = 0;
+  theCat.onclick = function() {
+    catMsg.textContent = purrs[times%purrs.length];
+    times++;
+    theCat.style.transform = "scale(1.07)";
+    setTimeout(()=>{theCat.style.transform="";},170);
+  }
+  window.closeCat = ()=>{catModal.classList.remove("active");};
+}
+window.petTheCat = petTheCat;
 
 // === COUNTDOWN TIMERS ===
 function pad(n){return n<10?'0'+n:n;}
@@ -457,25 +438,23 @@ function getNextOctober1() {
 function getRelStart() {
   return new Date(2023,11,1,0,0,0,0); // Dec is 11
 }
+
 function updateCountdowns() {
   let cNayu = document.getElementById("countNayu");
   let cTish = document.getElementById("countTish");
   let cRel = document.getElementById("countRel");
   if (!cNayu || !cTish || !cRel) return;
   let now = new Date();
-
   // Nayu's Birthday
   let nbd = getNextOctober23();
   let delta = Math.floor((nbd-now)/1000);
   let days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
   cNayu.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
   // Tish's Birthday
   let tbd = getNextOctober1();
   delta = Math.floor((tbd-now)/1000);
   days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
   cTish.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
   // Relationship counter (since)
   let rel = getRelStart();
   delta = Math.floor((now-rel)/1000);
