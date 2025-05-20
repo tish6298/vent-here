@@ -12,7 +12,7 @@
     <div class="subtitle">Here’s everything you’ve ever shared, held just for you by me. Always safe, always loved.</div>
     <div id="passwordPrompt">
       <label for="vaultPassword">What’s our secret word?</label>
-      <input type="password" id="vaultPassword" placeholder="Enter here..." class="themed-input">
+      <input type="password" id="vaultPassword" class="themed-input" placeholder="Enter here...">
       <button onclick="unlockVault()" class="big-btn" id="unlockBtn">Unlock Vault</button>
     </div>
     <div id="vaultSection" style="display: none;">
@@ -21,6 +21,7 @@
       <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
     </div>
   </div>
+
   <div id="previewModal" class="modal">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
