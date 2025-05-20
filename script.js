@@ -56,6 +56,14 @@ function submitVent() {
   const text = document.getElementById("vent").value.trim();
   if (!text) return alert("Please write something.");
 
+  const overlay = document.getElementById("overlay");
+  const loader = document.getElementById("loader");
+  const successMessage = document.getElementById("successMessage");
+
+  overlay.style.display = "flex";
+  loader.style.display = "block";
+  successMessage.style.display = "none";
+
   const date = new Date().toLocaleString();
   const preview = text.split(" ").slice(0, 10).join(" ") + "...";
 
@@ -72,11 +80,21 @@ function submitVent() {
       encrypted,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      alert("Submitted! It's safely stored.");
       document.getElementById("vent").value = "";
-    }).catch(err => alert("Error saving vent: " + err.message));
+
+      loader.style.display = "none";
+      successMessage.style.display = "block";
+
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 2000); // Hide after 2 seconds
+    }).catch(err => {
+      overlay.style.display = "none";
+      alert("Error saving vent: " + err.message);
+    });
   });
 }
+
 
 // --- VAULT ACCESS ---
 function unlockVault() {
