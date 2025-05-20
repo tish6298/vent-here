@@ -1,36 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vault - Private</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vault</title>
+  <link rel="stylesheet" href="vault-style.css" />
 </head>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <body>
-  <div class="container">
-    <h1>🔒 Nayu's Vault</h1>
-    <div id="passwordPrompt">
-      <label for="vaultPassword">Enter Vault Password:</label>
-      <input type="password" id="vaultPassword" placeholder="Password">
-      <button onclick="unlockVault()">Unlock</button>
-    </div>
-
-    <div id="vaultSection" style="display: none;">
-      <h2>Stored Vents</h2>
-      <ul id="ventList"></ul>
-      <button onclick="deleteSelected()">🗑️ Delete Selected</button>
-    </div>
+  <div class="vault-container">
+    <h2>🔐 Vault</h2>
+    <input type="password" id="vaultPassword" placeholder="Enter Vault Password" />
+    <button onclick="unlockVault()">Unlock</button>
+    <ul id="vaultList"></ul>
   </div>
 
-  <script src="script.js"></script>
-  <!-- Modal for preview -->
-<div id="previewModal" class="modal">
-  <div class="modal-content">
-    <span id="closeModal" class="close-button">&times;</span>
-    <h3>Full Vent</h3>
-    <p id="modalText"></p>
-  </div>
-</div>
+  <script src="vault-script.js"></script>
 </body>
 </html>
