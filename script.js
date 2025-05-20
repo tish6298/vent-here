@@ -68,7 +68,6 @@ function submitVent() {
 
   const vaultPassword = "tishcancode";
   encryptText(JSON.stringify(entry), vaultPassword).then((encrypted) => {
-    // Save encrypted vent to Firestore collection "nayuVault"
     db.collection("nayuVault").add({
       encrypted,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -93,19 +92,23 @@ function unlockVault() {
   const list = document.getElementById("ventList");
   list.innerHTML = "";
 
-  // Fetch all vents from Firestore ordered by timestamp desc
   db.collection("nayuVault").orderBy("timestamp", "desc").get()
     .then(querySnapshot => {
       if (querySnapshot.empty) {
         list.innerHTML = "<li>No vents found.</li>";
         return;
       }
-      querySnapshot.forEach((doc, index) => {
+
+      querySnapshot.forEach((doc) => {
         const entry = doc.data().encrypted;
         decryptText(entry, inputPassword).then(decrypted => {
           const data = JSON.parse(decrypted);
           const li = document.createElement("li");
           li.dataset.docId = doc.id;
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.dataset.docId = doc.id;
 
           const header = document.createElement("div");
           header.className = "ventHeader";
@@ -114,13 +117,36 @@ function unlockVault() {
           const preview = document.createElement("div");
           preview.textContent = data.preview;
 
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.dataset.docId = doc.id;
+          const previewBtn = document.createElement("button");
+          previewBtn.textContent = "🔍 Preview";
+          previewBtn.className = "small-btn";
+          previewBtn.onclick = () => {
+            alert(data.fullText);
+          };
+
+          const downloadBtn = document.createElement("button");
+          downloadBtn.textContent = "⬇️ Download";
+          downloadBtn.className = "small-btn";
+          downloadBtn.onclick = () => {
+            const blob = new Blob([data.fullText], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${data.date.replace(/[/:]/g, "-")} - ${data.mood}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+
+          const buttonRow = document.createElement("div");
+          buttonRow.className = "button-row";
+          buttonRow.appendChild(previewBtn);
+          buttonRow.appendChild(downloadBtn);
 
           li.appendChild(checkbox);
           li.appendChild(header);
           li.appendChild(preview);
+          li.appendChild(buttonRow);
+
           list.appendChild(li);
         }).catch(() => console.error("Could not decrypt entry. Skipping."));
       });
