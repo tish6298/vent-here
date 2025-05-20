@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="ventContainer">
     <h1>Hey Nayu, I'm always here for you 💗</h1>
     <div class="subtitle">This space is all yours, built just for you by Tish. Feel free to open up, or get comforted below.</div>
     <div class="countdowns">
@@ -53,40 +53,22 @@
     <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="Type anything. Style it, make it yours. I love every word."></div>
     <button class="big-btn" onclick="submitVent()">Send My Feelings</button>
     <p class="info love-message">Everything here is private and just for us. I’m proud of you, always. 💖</p>
-
-    <div id="loadingCard" class="loading-card">
-      <div class="loader-heart"></div>
-      <div class="loading-text">Sending to your vault...</div>
-      <div class="loading-bar"><div class="loading-bar-fill" id="progressBar"></div></div>
-    </div>
-
-    <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
-
-    <button class="vault-btn" onclick="window.location.href='vault.html'">Open Our Vault</button>
-
-    <div class="comfort-corner">
-      <h2 class="comfort-title">Comfort Corner</h2>
-      <div class="activities">
-        <button onclick="startBreathing()" class="activity-btn">Breathe With Me</button>
-        <button onclick="complimentRain()" class="activity-btn">Shower Compliments</button>
-        <button onclick="petTheCat()" class="activity-btn">Pet Bixie</button>
-      </div>
-      <div id="breathingModal" class="activity-modal">
-        <div class="activity-content">
-          <span class="close-button" onclick="closeBreathing()">&times;</span>
-          <div class="breath-circle" id="breathCircle"></div>
-          <div class="breath-instruct" id="breathInstruct">Ready?</div>
-        </div>
-      </div>
-      <div id="catModal" class="activity-modal">
-        <div class="activity-content cat-content">
-          <span class="close-button" onclick="closeCat()">&times;</span>
-          <div id="theCat"></div>
-          <div id="catMsg" class="cat-msg"></div>
-        </div>
-      </div>
-    </div>
+    <button class="vault-btn" onclick="openVaultWindow()">Open Our Vault</button>
+    <button class="comfort-btn" onclick="openComfortCorner()">Open Comfort Corner</button>
   </div>
+
+  <!-- Loading and modal popups -->
+  <div id="loadingCard" class="center-modal">
+    <div class="loader-heart"></div>
+    <div class="loading-text">Sending to your vault...</div>
+    <div class="loading-bar"><div class="loading-bar-fill" id="progressBar"></div></div>
+  </div>
+  <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
+  <div id="vaultWindow" class="center-modal vault-window"></div>
+  <div id="comfortModal" class="center-modal comfort-window"></div>
+
+  <!-- Activities Modal/Window is now only in comfortModal -->
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
