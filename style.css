@@ -271,7 +271,7 @@ select:focus, input[type="password"]:focus {
   font-weight: 800;
   color: #ea6fbd;
   margin-bottom: 8px;
-  margin-top: 13px;
+  margin-top: 16px;
   text-align: center;
   letter-spacing: .2px;
 }
