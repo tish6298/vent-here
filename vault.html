@@ -13,7 +13,7 @@
     <div id="passwordPrompt">
       <label for="vaultPassword">What’s our secret word?</label>
       <input type="password" id="vaultPassword" placeholder="Enter here...">
-      <button onclick="unlockVault()">Unlock Vault</button>
+      <button id="unlockBtn" class="big-btn" onclick="unlockVault()">Unlock Vault</button>
     </div>
     <div id="vaultSection" style="display: none;">
       <div class="vault-list-title">All Your Feelings, Right Here:</div>
@@ -21,7 +21,7 @@
       <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
     </div>
   </div>
-  <div id="previewModal" class="modal">
+  <div id="previewModal" class="modal vault-modal-center">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
       <div class="preview-header">Your memory, just as you wrote it:</div>
@@ -31,6 +31,13 @@
   </div>
   <div id="menuBackdrop" style="display:none; position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9000;"></div>
   <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
+  <div id="vaultLoader" class="vault-loading-overlay">
+    <div class="vault-loading-content">
+      <div class="loader-heart"></div>
+      <div class="loading-text">Loading your cozy vault...</div>
+      <div class="loading-bar"><div class="loading-bar-fill" id="vaultLoadingBar"></div></div>
+    </div>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
