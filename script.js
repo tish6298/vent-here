@@ -11,31 +11,41 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Custom Modal Alert
+// --- Custom Modal Alert ---
 function showCustomModal(msg) {
   const modal = document.getElementById('customModal');
-  modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" style="margin-top:12px;" class="big-btn">OK</button>';
-  modal.style.display = "flex";
+  if (modal) {
+    modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" style="margin-top:12px;" class="big-btn">OK</button>';
+    modal.style.display = "flex";
+  } else {
+    alert(msg); // fallback
+  }
 }
 function closeCustomModal() {
-  document.getElementById('customModal').style.display = 'none';
+  const modal = document.getElementById('customModal');
+  if (modal) modal.style.display = 'none';
 }
 
 // --- FORMAT TOOLS ---
-function formatDoc(cmd, val) {
-  document.execCommand(cmd, false, val);
-  document.getElementById("vent").focus();
+if (document.getElementById("vent")) {
+  function formatDoc(cmd, val) {
+    document.execCommand(cmd, false, val);
+    document.getElementById("vent").focus();
+  }
+  document.getElementById("vent").addEventListener('paste', function(e){
+    e.preventDefault();
+    var text = (e.originalEvent || e).clipboardData.getData('text/plain');
+    document.execCommand('insertHTML', false, text.replace(/\n/g,"<br>"));
+  });
+  window.formatDoc = formatDoc; // For toolbar buttons
 }
-document.getElementById("vent").addEventListener('paste', function(e){
-  e.preventDefault();
-  var text = (e.originalEvent || e).clipboardData.getData('text/plain');
-  document.execCommand('insertHTML', false, text.replace(/\n/g,"<br>"));
-});
 
 // --- VENT SUBMISSION ---
 function submitVent() {
-  const mood = document.getElementById("mood").value;
+  const moodElem = document.getElementById("mood");
   const ventElem = document.getElementById("vent");
+  if (!moodElem || !ventElem) return;
+  const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
     showCustomModal("Can you write a little more? I want to hear you.");
@@ -74,6 +84,7 @@ function submitVent() {
     });
   });
 }
+window.submitVent = submitVent; // For HTML button
 
 // --- AES ENCRYPTION ---
 function encryptText(text, password) {
@@ -110,7 +121,9 @@ function decryptText(base64, password) {
 
 // --- VAULT ACCESS ---
 function unlockVault() {
-  const inputPassword = document.getElementById("vaultPassword").value;
+  const inputElem = document.getElementById("vaultPassword");
+  if (!inputElem) return;
+  const inputPassword = inputElem.value;
   if (inputPassword !== "tishcancode") {
     showCustomModal("That’s not our secret word… try again?");
     return;
@@ -119,8 +132,11 @@ function unlockVault() {
   document.getElementById("vaultSection").style.display = "block";
   loadVaultEntries(inputPassword);
 }
+window.unlockVault = unlockVault;
+
 function loadVaultEntries(password) {
   const list = document.getElementById("ventList");
+  if (!list) return;
   list.innerHTML = "";
   db.collection("nayuVault").orderBy("timestamp", "desc").get()
     .then(querySnapshot => {
@@ -174,7 +190,8 @@ function createVaultCard(data, docId) {
   menuPopup.querySelector(".menu-read").onclick = e => {
     showModal(data.fullText);
     menuPopup.style.display = "none";
-    document.getElementById("menuBackdrop").style.display = "none";
+    const backdrop = document.getElementById("menuBackdrop");
+    if (backdrop) backdrop.style.display = "none";
     e.stopPropagation();
   };
   menuPopup.querySelector(".menu-download").onclick = e => {
@@ -182,29 +199,32 @@ function createVaultCard(data, docId) {
     safeFilename = safeFilename.replace(/[\s?<>\\:*|"]/g, '_');
     downloadText(data.fullText, safeFilename);
     menuPopup.style.display = "none";
-    document.getElementById("menuBackdrop").style.display = "none";
+    const backdrop = document.getElementById("menuBackdrop");
+    if (backdrop) backdrop.style.display = "none";
     e.stopPropagation();
   };
   menuBtn.onclick = function(e) {
     document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
     document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
+    const backdrop = document.getElementById("menuBackdrop");
     if (menuPopup.style.display === "block") {
       menuPopup.style.display = "none";
       menuBtn.classList.remove("active");
-      document.getElementById("menuBackdrop").style.display = "none";
+      if (backdrop) backdrop.style.display = "none";
     } else {
       menuPopup.style.display = "block";
       menuBtn.classList.add("active");
-      document.getElementById("menuBackdrop").style.display = "block";
+      if (backdrop) backdrop.style.display = "block";
       menuPopup.style.left = "auto";
     }
     e.stopPropagation();
   };
-  if (document.getElementById("menuBackdrop")) {
-    document.getElementById("menuBackdrop").onclick = function() {
+  const backdrop = document.getElementById("menuBackdrop");
+  if (backdrop) {
+    backdrop.onclick = function() {
       document.querySelectorAll(".menu-popup").forEach(m => m.style.display="none");
       document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
-      document.getElementById("menuBackdrop").style.display = "none";
+      backdrop.style.display = "none";
     };
   }
   card.appendChild(checkbox);
@@ -223,6 +243,8 @@ function deleteSelected() {
   }
   showCustomModal("Are you sure? This will really delete them forever.<br><br><button onclick='confirmDelete()' class='big-btn'>Yes, delete</button>");
 }
+window.deleteSelected = deleteSelected;
+
 function confirmDelete() {
   closeCustomModal();
   const checkboxes = document.querySelectorAll('.vault-card input[type="checkbox"]:checked');
@@ -239,13 +261,16 @@ function confirmDelete() {
     setTimeout(()=>location.reload(),1200);
   }).catch(err => showCustomModal("Error deleting: " + err.message));
 }
+window.confirmDelete = confirmDelete;
 
 // --- MODAL FOR ENTRY READING ---
 function showModal(text) {
   const modal = document.getElementById("previewModal");
   const modalText = document.getElementById("modalText");
-  modalText.innerHTML = text;
-  modal.style.display = "block";
+  if (modal && modalText) {
+    modalText.innerHTML = text;
+    modal.style.display = "block";
+  }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
@@ -277,11 +302,12 @@ if (document.getElementById("vaultPassword")) {
     });
 }
 
-// --- Activities / Games --- (unchanged, as in last reply)
+// --- Activities / Games ---
 function startBreathing() {
   const modal = document.getElementById("breathingModal");
   const instruct = document.getElementById("breathInstruct");
   const circle = document.getElementById("breathCircle");
+  if (!modal) return;
   modal.style.display = "flex";
   let steps = [
     {txt:"Breathe In", time: 3500, scale:1.21, color:"#fa8dc0"},
@@ -302,6 +328,8 @@ function startBreathing() {
   modal.onclick = function(e) { if(e.target===modal){ active=false; modal.style.display="none"; } };
   window.closeBreathing = () => { active=false; modal.style.display="none"; };
 }
+window.startBreathing = startBreathing;
+
 function complimentRain() {
   const compliments = [
     "You are enough.", "You’re so strong.", "Your feelings are valid.",
@@ -334,95 +362,14 @@ function complimentRain() {
     }, i*160);
   }
 }
+window.complimentRain = complimentRain;
+
+// --- Pet Bixie (ginger baby cat) ---
 function petTheCat() {
   const catModal = document.getElementById("catModal");
   const theCat = document.getElementById("theCat");
   const catMsg = document.getElementById("catMsg");
-  catModal.style.display = "flex";
-  catMsg.textContent = "Tap the cat to pet her!";
-  theCat.innerHTML = `
-    <svg width="100" height="80" viewBox="0 0 120 100" fill="none">
-      <ellipse cx="60" cy="72" rx="38" ry="24" fill="#fce3f5"/>
-      <ellipse cx="45" cy="45" rx="18" ry="18" fill="#ffd3ef"/>
-      <ellipse cx="75" cy="45" rx="18" ry="18" fill="#ffd3ef"/>
-      <ellipse cx="60" cy="70" rx="27" ry="18" fill="#fff"/>
-      <ellipse cx="60" cy="60" rx="23" ry="12" fill="#ffd3ef"/>
-      <ellipse cx="60" cy="67" rx="14" ry="7" fill="#f8b9e8"/>
-      <ellipse cx="49" cy="44" rx="4" ry="7" fill="#cfa1e6"/>
-      <ellipse cx="71" cy="44" rx="4" ry="7" fill="#cfa1e6"/>
-      <ellipse cx="56" cy="52" rx="2.3" ry="3.6" fill="#553253"/>
-      <ellipse cx="64" cy="52" rx="2.3" ry="3.6" fill="#553253"/>
-      <ellipse cx="60" cy="61" rx="4" ry="2" fill="#fae6f7"/>
-      <path d="M60 54 Q61 58,62 54" stroke="#b570ad" stroke-width="1.5" fill="none"/>
-      <polygon points="37,23 42,34 44,29" fill="#f8b9e8"/>
-      <polygon points="83,23 78,34 76,29" fill="#f8b9e8"/>
-    </svg>
-  `;
-  let purrs = [
-    "Purrr... she loves you.",
-    "She leans into your hand.",
-    "She closes her eyes and smiles.",
-    "Your love calms her little heart."
-  ];
-  let times = 0;
-  theCat.onclick = function() {
-    catMsg.textContent = purrs[times%purrs.length];
-    times++;
-    theCat.style.transform = "scale(1.05)";
-    setTimeout(()=>{theCat.style.transform="";},200);
-  }
-  window.closeCat = ()=>{catModal.style.display="none";};
-}
-// === COUNTDOWN TIMERS ===
-function pad(n){return n<10?'0'+n:n;}
-// Next 23rd October (Nayu's birthday)
-function getNextOctober23() {
-  let now = new Date();
-  let y = now.getFullYear();
-  let d = new Date(y, 9, 23, 0,0,0,0); // Oct is month 9
-  if (now > d) d = new Date(y+1, 9, 23, 0,0,0,0);
-  return d;
-}
-// Next 1st October (Tish's birthday)
-function getNextOctober1() {
-  let now = new Date();
-  let y = now.getFullYear();
-  let d = new Date(y, 9, 1, 0,0,0,0);
-  if (now > d) d = new Date(y+1, 9, 1, 0,0,0,0);
-  return d;
-}
-// Relationship counter since 1 Dec 2023
-function getRelStart() {
-  return new Date(2023,11,1,0,0,0,0); // Dec is 11
-}
-
-function updateCountdowns() {
-  // Nayu's Birthday
-  let now = new Date();
-  let nbd = getNextOctober23();
-  let delta = Math.floor((nbd-now)/1000);
-  let days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
-  document.getElementById("countNayu").textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
-  // Tish's Birthday
-  let tbd = getNextOctober1();
-  delta = Math.floor((tbd-now)/1000);
-  days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
-  document.getElementById("countTish").textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
-  // Relationship counter (since)
-  let rel = getRelStart();
-  delta = Math.floor((now-rel)/1000);
-  days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
-  document.getElementById("countRel").textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-}
-if(document.getElementById("countNayu")) setInterval(updateCountdowns, 1000), updateCountdowns();
-
-// --- Pet Bixie, ginger baby cat ---
-function petTheCat() {
-  const catModal = document.getElementById("catModal");
-  const theCat = document.getElementById("theCat");
-  const catMsg = document.getElementById("catMsg");
+  if (!catModal || !theCat || !catMsg) return;
   catModal.style.display = "flex";
   catMsg.textContent = "Tap Bixie to pet!";
   theCat.innerHTML = `
@@ -458,3 +405,54 @@ function petTheCat() {
   }
   window.closeCat = ()=>{catModal.style.display="none";};
 }
+window.petTheCat = petTheCat;
+
+// === COUNTDOWN TIMERS ===
+function pad(n){return n<10?'0'+n:n;}
+// Next 23rd October (Nayu's birthday)
+function getNextOctober23() {
+  let now = new Date();
+  let y = now.getFullYear();
+  let d = new Date(y, 9, 23, 0,0,0,0); // Oct is month 9
+  if (now > d) d = new Date(y+1, 9, 23, 0,0,0,0);
+  return d;
+}
+// Next 1st October (Tish's birthday)
+function getNextOctober1() {
+  let now = new Date();
+  let y = now.getFullYear();
+  let d = new Date(y, 9, 1, 0,0,0,0);
+  if (now > d) d = new Date(y+1, 9, 1, 0,0,0,0);
+  return d;
+}
+// Relationship counter since 1 Dec 2023
+function getRelStart() {
+  return new Date(2023,11,1,0,0,0,0); // Dec is 11
+}
+
+function updateCountdowns() {
+  let cNayu = document.getElementById("countNayu");
+  let cTish = document.getElementById("countTish");
+  let cRel = document.getElementById("countRel");
+  if (!cNayu || !cTish || !cRel) return;
+  let now = new Date();
+
+  // Nayu's Birthday
+  let nbd = getNextOctober23();
+  let delta = Math.floor((nbd-now)/1000);
+  let days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
+  cNayu.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
+
+  // Tish's Birthday
+  let tbd = getNextOctober1();
+  delta = Math.floor((tbd-now)/1000);
+  days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
+  cTish.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
+
+  // Relationship counter (since)
+  let rel = getRelStart();
+  delta = Math.floor((now-rel)/1000);
+  days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
+  cRel.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
+}
+if(document.getElementById("countNayu")) setInterval(updateCountdowns, 1000), updateCountdowns();
