@@ -2,60 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nayu’s Vault — With All My Love</title>
+  <title>Nayu’s Private Vault (by Tish)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Hi Nayu, it’s just you and me.</h1>
-    <div class="subtitle">Everything here is yours, held with love by me.</div>
+    <h1>Our Heart Vault</h1>
+    <div class="subtitle">Here’s everything you’ve ever shared, for by Tish to read and love u more.</div>
     <div id="passwordPrompt">
-      <label for="vaultPassword">Our secret word?</label>
-      <input type="password" id="vaultPassword" placeholder="Enter our safe word">
+      <label for="vaultPassword">Enter Vault Password :3</label>
+      <input type="password" id="vaultPassword" placeholder="Enter here...">
       <button onclick="unlockVault()">Unlock Vault</button>
     </div>
-
     <div id="vaultSection" style="display: none;">
-      <h2>Your Heart Notes</h2>
-      <ul id="ventList"></ul>
-      <button onclick="deleteSelected()" class="delete-btn">Delete Selected (I’ll never judge)</button>
-      <div id="comfortCorner">
-        <h3>Comfort Corner</h3>
-        <div class="activities">
-          <button onclick="startBreathing()" class="activity-btn">Breathe With Me</button>
-          <button onclick="complimentRain()" class="activity-btn">Shower Compliments</button>
-          <button onclick="petTheCat()" class="activity-btn">Pet the Cat</button>
-        </div>
-        <div id="breathingModal" class="activity-modal">
-          <div class="activity-content">
-            <span class="close-button" onclick="closeBreathing()">&times;</span>
-            <div class="breath-circle" id="breathCircle"></div>
-            <div class="breath-instruct" id="breathInstruct">Ready?</div>
-          </div>
-        </div>
-        <div id="catModal" class="activity-modal">
-          <div class="activity-content cat-content">
-            <span class="close-button" onclick="closeCat()">&times;</span>
-            <div id="theCat"></div>
-            <div id="catMsg" class="cat-msg"></div>
-          </div>
-        </div>
-      </div>
+      <div class="vault-list-title">from nayu:</div>
+      <div class="vault-list" id="ventList"></div>
+      <button onclick="deleteSelected()" class="delete-btn">Delete Selected</button>
     </div>
   </div>
-
-  <!-- Slide-up Modal for Preview -->
   <div id="previewModal" class="modal">
     <div class="modal-content glassy-modal">
       <span id="closeModal" class="close-button">&times;</span>
-      <div class="preview-header">Something you once shared with me</div>
+      <div class="preview-header">Your memory, just as you wrote it:</div>
       <div id="modalText" class="preview-body"></div>
-      <div class="modal-footer">It’s safe here. I’m always listening.</div>
+      <div class="modal-footer">Always safe here. Always loved.</div>
     </div>
   </div>
-
   <div id="menuBackdrop" style="display:none; position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9000;"></div>
+  <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
