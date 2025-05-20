@@ -5,11 +5,12 @@
   <title>Vent Here, Nayu</title>
   <link rel="stylesheet" href="style.css">
 </head>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <body>
   <div class="container">
-    <h1>Hey Nayu, Let It Out 💬</h1>
+    <h1>It's okay let it out, you're safe here!</h1>
+
     <label for="mood">Your mood right now:</label>
     <select id="mood">
       <option value="Insecure">🫥 Insecure</option>
@@ -28,6 +29,9 @@
 
     <button onclick="submitVent()">Submit</button>
     <p class="info">Everything you say here is just for me to understand better. You're safe.</p>
+
+    <!-- Vault Access Button -->
+    <button onclick="window.location.href='vault.html'" style="margin-top: 20px;">🔒 Open Vault</button>
   </div>
 
   <script src="script.js"></script>
