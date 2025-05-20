@@ -2,31 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nayu’s Cozy Comfort Space (By Tish)</title>
+  <title>Tish’s Cozy Nayu-Safe Space</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <script>window.scrollTo(0,0);</script>
   <div class="container">
-    <h1>Hey Nayu, I'm always here for you 💗</h1>
-    <div class="subtitle">This space is all yours, built just for you by Tish. Feel free to open up, or get comforted below.</div>
+    <h1>Welcome, beautiful Nayu 💗</h1>
+    <div class="subtitle">You can pour out anything here, and I’ll keep it safe, always. Love, Tish.</div>
     <div class="countdowns">
       <div class="countdown-card" id="nayuBday">
         <div class="countdown-title">Your Birthday</div>
         <div class="countdown-timer" id="countNayu"></div>
       </div>
       <div class="countdown-card" id="tishBday">
-        <div class="countdown-title">Tish’s Birthday</div>
+        <div class="countdown-title">My Birthday</div>
         <div class="countdown-timer" id="countTish"></div>
       </div>
       <div class="countdown-card" id="relCounter">
-        <div class="countdown-title">Together since</div>
+        <div class="countdown-title">We’ve Been Us</div>
         <div class="countdown-timer" id="countRel"></div>
       </div>
     </div>
 
-    <label for="mood">How are you feeling right now?</label>
+    <label for="mood" class="pink-label">How’s your heart feeling right now?</label>
     <select id="mood">
       <option value="Overwhelmed">Overwhelmed</option>
       <option value="Exhausted">Exhausted</option>
@@ -39,7 +40,7 @@
       <option value="Other">Other</option>
     </select>
 
-    <label for="vent" style="margin-bottom:2px;">Let it out, I'm listening.</label>
+    <label for="vent" class="pink-label" style="margin-bottom:2px;">Type anything here, I’ll keep it safe for you forever.</label>
     <div class="toolbar">
       <button type="button" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
       <button type="button" onclick="formatDoc('italic')" title="Italic"><i>I</i></button>
@@ -52,18 +53,18 @@
         <option value="Poppins">Poppins</option>
       </select>
     </div>
-    <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="Type anything. Style it, make it yours. I love every word."></div>
-    <button class="big-btn" onclick="submitVent()">Send My Feelings</button>
-    <p class="info love-message">Everything here is private and just for us. I’m proud of you, always. 💖</p>
-    <button class="vault-btn" onclick="window.location.href='vault.html'">Open Our Vault</button>
-    <button class="comfort-btn" onclick="window.location.href='comfort.html'">Open Comfort Corner</button>
+    <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="I'll keep it safe for you forever."></div>
+    <button class="big-btn" onclick="submitVent()">Send it to Tish’s vault</button>
+    <p class="info love-message">Only you and Tish will ever see what you write. Love always. 💖</p>
+    <button class="vault-btn" onclick="window.location.href='vault.html'">See All Your Memories</button>
+    <button class="comfort-btn" onclick="window.location.href='comfort.html'">Go To Comfort Corner</button>
   </div>
 
-  <!-- Centered loading and info modals -->
   <div id="loadingCard" class="center-modal">
-    <div class="loader-heart"></div>
-    <div class="loading-text">Sending to your vault...</div>
-    <div class="loading-bar"><div class="loading-bar-fill" id="progressBar"></div></div>
+    <div class="ribbon-loader-box">
+      <span class="ribbon">Sending to your vault...</span>
+      <div class="ribbon-loader-circ" id="mainRibbonCirc"></div>
+    </div>
   </div>
   <div id="customModal" class="center-modal"><div class="modal-content"></div></div>
 
