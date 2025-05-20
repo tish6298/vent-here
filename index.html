@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vent Here, Nayu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Hey Nayu, Let It Out 💬</h1>
+    <label for="mood">Your mood right now:</label>
+    <select id="mood">
+      <option value="Insecure">🫥 Insecure</option>
+      <option value="Overthinking">🤯 Overthinking</option>
+      <option value="Doubtful">😶‍🌫️ Doubtful</option>
+      <option value="Confronting">🧍 Confronting</option>
+      <option value="Complaining">🙄 Complaining</option>
+      <option value="Burnt Out">😩 Burnt Out</option>
+      <option value="Masking">🙃 Masking</option>
+      <option value="Angry">😤 Angry</option>
+      <option value="Blank">😐 Blank</option>
+    </select>
+
+    <label for="vent">What’s on your mind?</label>
+    <textarea id="vent" rows="10" placeholder="Type it here..."></textarea>
+
+    <button onclick="submitVent()">Submit</button>
+    <p class="info">Everything you say here is just for me to understand better. You're safe.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
