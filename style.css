@@ -15,7 +15,7 @@ body {
   border-radius: 24px;
   box-shadow: 0 3px 32px #eab5e799;
   position: relative;
-  backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px;
 }
 
 .subtitle {
@@ -26,7 +26,6 @@ body {
   margin-top: -7px;
   font-weight: 500;
 }
-
 @media (max-width: 600px) {
   .container {
     width: 99vw;
@@ -36,7 +35,6 @@ body {
     min-height: 100vh;
   }
 }
-
 h1, h2, .comfort-title {
   text-align: center;
   margin-bottom: 12px;
@@ -45,30 +43,13 @@ h1, h2, .comfort-title {
   letter-spacing: 0.4px;
 }
 
-label {
+/* --- New for labels --- */
+label, .pink-label {
   display: block;
   margin-top: 18px;
   font-weight: 700;
   font-size: 16px;
-  color: #b763a6;
-}
-
-select, input[type="password"], .themed-input {
-  width: 100%;
-  padding: 12px 13px;
-  margin-top: 8px;
-  border: 1.1px solid #ffb4e6;
-  border-radius: 8px;
-  font-size: 16px;
-  background: rgba(255,255,255,0.98);
-  transition: border .19s;
-  font-family: inherit;
-}
-
-select:focus, input[type="password"]:focus, .themed-input:focus {
-  border: 1.5px solid #ea9fc6;
-  outline: none;
-  background: #fce3f5;
+  color: #ea6fbd !important;
 }
 
 /* Editor toolbar */
@@ -103,7 +84,7 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   min-width: 75px;
 }
 
-/* Editor area, with placeholder fix for all browsers */
+/* Editor area */
 .vent-area {
   width: 100%;
   min-height: 97px;
@@ -149,6 +130,7 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   display: block;
   text-align: center;
 }
+.big-btn[disabled], .vault-btn[disabled], .comfort-btn[disabled], .delete-btn[disabled] {opacity:0.65;pointer-events:none;}
 .big-btn:hover, .vault-btn:hover, .comfort-btn:hover, .back-btn:hover, #unlockBtn:hover {
   background: linear-gradient(90deg,#e867a1 10%,#d9a7e2 90%);
   box-shadow: 0 4px 16px #ea6fbd26;
@@ -171,7 +153,7 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   line-height: 1.35;
 }
 
-/* Central modals/dialogs/popups for loading or info */
+/* --- Pink Ribbon Loader --- */
 .center-modal {
   display: none;
   position: fixed;
@@ -185,43 +167,49 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .center-modal.active, .center-modal.show {
   display: flex !important;
 }
-.center-modal > * {
-  margin: auto;
-}
-
-#loadingCard, #vaultLoader {
-  background: rgba(255,255,255,0.96);
-  border-radius: 18px;
-  box-shadow: 0 8px 36px #f7bde299;
-  padding: 38px 25px 32px 25px;
-  max-width: 340px;
-  min-width: 210px;
-  min-height: 115px;
-  display: none;
+.ribbon-loader-box {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
-}
-#loadingCard.active, #vaultLoader.active { display: flex !important; }
-
-/* Small modal style for popups/letters */
-.center-modal .modal-content {
-  background: #fff6fa;
-  border-radius: 18px;
-  box-shadow: 0 5px 29px #eab5e7bb;
-  padding: 32px 26px 22px 26px;
-  margin: 0 auto;
-  width: 92vw; max-width: 330px;
-  text-align: center;
-  font-size: 17px;
-  font-weight: 700;
-  color: #ea6fbd;
+  background: linear-gradient(95deg, #ffe2fa 60%, #fec3e7 100%);
+  border-radius: 32px;
+  box-shadow: 0 4px 38px #f7bde255;
+  padding: 32px 37px 30px 37px;
+  min-width: 240px;
+  min-height: 115px;
   position: relative;
-  line-height: 1.44;
 }
+.ribbon {
+  background: linear-gradient(90deg,#ff87b2 20%,#ffb4e6 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 19px;
+  border-radius: 23px;
+  padding: 10px 32px;
+  box-shadow: 0 2px 9px #ffbddb38;
+  margin-bottom: 18px;
+  display: inline-block;
+}
+.ribbon-loader-circ {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 5px solid #ffd6ec;
+  border-top: 5px solid #ff87b2;
+  margin: 0 auto 14px auto;
+  animation: spin 0.85s linear infinite;
+  position: relative;
+  transition: border .33s;
+}
+.ribbon-loader-circ.done {
+  border: 5px solid #b5ffdc;
+  border-top: 5px solid #54db91;
+  animation: none;
+  background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23f5fffa'/%3E%3Cpath d='M10.5 16.5L15 21L22 13.5' stroke='%234ebd6c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 82%;
+}
+@keyframes spin {100% {transform: rotate(360deg);}}
 
 /* Activities/Comfort corner (comfort.html) */
 .comfort-content {
@@ -260,6 +248,26 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   background: linear-gradient(90deg,#e6b1ff 10%,#fa97bc 90%);
   color: #fff;
 }
+/* Bixie Cat Face */
+#theCat svg {
+  width: 95px; height: 95px;
+  display: block;
+  margin: 0 auto;
+}
+#theCat .bixie-blink {
+  animation: bixie-blink 2.7s infinite;
+}
+@keyframes bixie-blink {
+  0%, 95% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+.cat-msg {
+  font-size: 16px;
+  margin-top: 11px;
+  color: #ea6fbd;
+  font-weight: 700;
+  min-height: 24px;
+}
 .breath-circle {
   width: 90px; height: 90px; margin: 0 auto 13px auto;
   background: linear-gradient(135deg, #fcb9d2 50%, #b5fffc 100%);
@@ -281,23 +289,6 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   margin-top: 7px;
   margin-bottom: 2px;
 }
-.cat-content {
-  padding-top: 12px;
-}
-#theCat {
-  width: 110px; height: 100px; margin: 0 auto;
-  background: none;
-  user-select: none;
-  cursor: pointer;
-}
-.cat-msg {
-  font-size: 16px;
-  margin-top: 11px;
-  color: #ea6fbd;
-  font-weight: 700;
-  min-height: 24px;
-}
-
 /* Compliment Rain */
 .compliment-bubble {
   position: fixed;
@@ -312,6 +303,11 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   user-select: none;
   transition: opacity 0.2s, transform 0.2s;
   pointer-events: auto;
+  z-index: 15000;
+}
+.compliment-bubble.popped {
+  opacity: 0 !important;
+  transform: scale(1.18) rotate(-5deg) !important;
 }
 .compliment-heart {
   width: 1em;
@@ -322,7 +318,7 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
   display: inline-block;
 }
 
-/* --- Vault cards and list (compact, only date/mood) --- */
+/* Vault list expanded cards, no checkbox */
 .vault-list-title {
   font-size: 18px;
   font-weight: 800;
@@ -335,7 +331,7 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .vault-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 13px;
   margin-top: 8px;
   max-height: 320px;
   overflow-y: auto;
@@ -343,15 +339,14 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 }
 .vault-card {
   background: linear-gradient(130deg,#fff0f8 40%,#fbeeff 100%);
-  border-radius: 10px;
+  border-radius: 15px;
   box-shadow: 0 1px 12px #eab5e73a;
-  padding: 8px 11px 8px 11px;
+  padding: 14px 15px 14px 14px;
   position: relative;
   display: flex;
   flex-direction: row;
-  align-items: center;
-  font-size: 14px;
-  min-height: 32px;
+  align-items: flex-start;
+  font-size: 15px;
   overflow-x: hidden;
   word-break: break-word;
   min-width: 0;
@@ -360,34 +355,32 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .vault-card:hover {
   box-shadow: 0 5px 22px #ea97bc1a;
 }
-.vault-checkbox {
-  margin-top: 6px;
-}
 .vault-card-content {
   flex: 1 1 0;
   min-width: 0;
 }
 .vault-card-header {
   font-weight: 800;
-  font-size: 13.7px;
+  font-size: 15.7px;
   color: #ea6fbd;
   margin-bottom: 2px;
   letter-spacing: .2px;
   word-break: break-word;
   white-space: normal;
 }
-.vault-card-preview { display: none !important; }
 .menu-dots {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 21px;
   color: #efb7d9;
-  margin-left: 2px;
+  margin-left: 6px;
+  margin-top: 4px;
   padding: 2px 4px;
   border-radius: 8px;
   align-self: flex-start;
   transition: background .13s, color .14s;
+  z-index: 400;
 }
 .menu-dots:hover, .menu-dots.active {
   background: #ffe7f6;
@@ -396,12 +389,12 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .menu-popup {
   position: absolute;
   right: 8px;
-  top: 30px;
-  min-width: 85px;
+  top: 35px;
+  min-width: 95px;
   background: #fff;
   border-radius: 11px;
   box-shadow: 0 7px 24px #ffb4e678;
-  z-index: 9100;
+  z-index: 410;
   display: flex;
   flex-direction: column;
   animation: fadeIn .18s;
@@ -410,10 +403,10 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .menu-popup button {
   background: none;
   color: #ea6fbd;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-align: left;
-  padding: 8px 13px;
+  padding: 10px 15px;
   border: none;
   border-bottom: 1px solid #f7e3fc;
   border-radius: 0;
@@ -427,6 +420,10 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 .menu-popup button:hover {
   background: #ffe7f6;
   color: #d83a99;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-12px);}
+  to { opacity: 1; transform: translateY(0);}
 }
 
 /* Modal for entry reading */
@@ -503,10 +500,6 @@ select:focus, input[type="password"]:focus, .themed-input:focus {
 }
 .close-button:hover {
   color: #e567a8;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-12px);}
-  to { opacity: 1; transform: translateY(0);}
 }
 
 /* --- Countdown Cards --- */
