@@ -5,7 +5,6 @@
   <title>Nayu’s Cozy Comfort Space (By Tish)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -26,7 +25,6 @@
         <div class="countdown-timer" id="countRel"></div>
       </div>
     </div>
-
     <label for="mood">How are you feeling right now?</label>
     <select id="mood">
       <option value="Overwhelmed">Overwhelmed</option>
@@ -39,7 +37,6 @@
       <option value="Angry">Angry</option>
       <option value="Other">Other</option>
     </select>
-
     <label for="vent" style="margin-bottom:2px;">Let it out, I'm listening.</label>
     <div class="toolbar">
       <button type="button" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
@@ -61,11 +58,8 @@
       <div class="loading-text">Sending to your vault...</div>
       <div class="loading-bar"><div class="loading-bar-fill" id="progressBar"></div></div>
     </div>
-
     <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
-
     <button class="vault-btn" onclick="window.location.href='vault.html'">Open Our Vault</button>
-
     <div class="comfort-corner">
       <h2 class="comfort-title">Comfort Corner</h2>
       <div class="activities">
@@ -87,13 +81,6 @@
           <div id="catMsg" class="cat-msg"></div>
         </div>
       </div>
-    </div>
-  </div>
-  <div id="globalLoader" class="vault-loading-overlay">
-    <div class="vault-loading-content">
-      <div class="loader-heart"></div>
-      <div class="loading-text">Loading your cozy vault...</div>
-      <div class="loading-bar"><div class="loading-bar-fill" id="vaultLoadingBar"></div></div>
     </div>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
