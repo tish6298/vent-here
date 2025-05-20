@@ -11,33 +11,48 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- Utility: Central Modals/Popups ---
-function showLoading(msg) {
-  const loading = document.getElementById('loadingCard') || document.getElementById('vaultLoader');
-  if (loading) {
-    let text = loading.querySelector('.loading-text');
-    if (text) text.innerText = msg;
-    loading.classList.add('active');
+window.onload = function() {
+  window.scrollTo(0, 0);
+};
+
+// --- Loader Ribbon ---
+function showRibbonLoader(msg, circId) {
+  const modal = document.getElementById(circId === "vaultRibbonCirc" ? "vaultLoader" : "loadingCard");
+  if (!modal) return;
+  modal.classList.add('active');
+  let ribbon = modal.querySelector('.ribbon');
+  if (ribbon) ribbon.innerText = msg;
+  let circ = modal.querySelector('.ribbon-loader-circ');
+  if (circ) {
+    circ.classList.remove('done');
+    circ.style.background = '';
   }
 }
-function hideLoading() {
-  let modals = document.querySelectorAll('#loadingCard, #vaultLoader');
-  modals.forEach(m => m.classList.remove('active'));
+function hideRibbonLoader(circId, successText) {
+  const modal = document.getElementById(circId === "vaultRibbonCirc" ? "vaultLoader" : "loadingCard");
+  if (!modal) return;
+  let circ = modal.querySelector('.ribbon-loader-circ');
+  if (circ) circ.classList.add('done');
+  let ribbon = modal.querySelector('.ribbon');
+  if (ribbon && successText) ribbon.innerText = successText;
+  setTimeout(() => {
+    modal.classList.remove('active');
+    if (circ) circ.classList.remove('done');
+    if (ribbon && successText) ribbon.innerText = '';
+  }, 850);
 }
 function showCustomModal(msg) {
   const modal = document.getElementById('customModal');
   if (modal) {
     modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" class="big-btn">OK</button>';
     modal.classList.add("active");
+    document.body.style.overflow = "hidden";
   }
 }
 function closeCustomModal() {
   const modal = document.getElementById('customModal');
   if (modal) modal.classList.remove('active');
-}
-function hideAllPopups() {
-  hideLoading();
-  closeCustomModal();
+  document.body.style.overflow = "";
 }
 
 // --- FORMAT TOOLS ---
@@ -51,28 +66,26 @@ if (document.getElementById("vent")) {
     var text = (e.originalEvent || e).clipboardData.getData('text/plain');
     document.execCommand('insertHTML', false, text.replace(/\n/g,"<br>"));
   });
-  window.formatDoc = formatDoc; // For toolbar buttons
+  window.formatDoc = formatDoc;
 }
 
 // --- VENT SUBMISSION ---
+let ventDisabled = false;
 function submitVent() {
+  if (ventDisabled) return;
   const moodElem = document.getElementById("mood");
   const ventElem = document.getElementById("vent");
   if (!moodElem || !ventElem) return;
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal("Can you write a little more? I want to hear you.");
+    showCustomModal("Write a little more for me? I want to know you better.");
     return;
   }
-  showLoading("Sending to your vault...");
-  let progress = 0;
-  let pb = document.getElementById("progressBar");
-  if (pb) pb.style.width = "0%";
-  let intv = setInterval(()=>{
-    progress = Math.min(progress + 15 + Math.random()*12, 92);
-    if (pb) pb.style.width = progress + "%";
-  }, 190);
+  ventDisabled = true;
+  showRibbonLoader("Sending to your vault...", "mainRibbonCirc");
+  const btn = document.querySelector(".big-btn");
+  if (btn) btn.disabled = true;
 
   const date = new Date().toLocaleString();
   const preview = ventElem.innerText.split(" ").slice(0, 18).join(" ") + (ventElem.innerText.split(" ").length > 18 ? "..." : "");
@@ -84,16 +97,17 @@ function submitVent() {
       encrypted,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      clearInterval(intv);
-      if (pb) pb.style.width = "100%";
+      hideRibbonLoader("mainRibbonCirc", "Saved with love!");
+      ventElem.innerHTML = '';
+      if (btn) btn.disabled = false;
       setTimeout(()=>{
-        hideLoading();
-        ventElem.innerHTML = '';
-        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗");
-      }, 700);
+        showCustomModal("It’s safe with me now. Thank you for trusting me, sweetheart 💗");
+        ventDisabled = false;
+      }, 800);
     }).catch(err => {
-      clearInterval(intv);
-      hideLoading();
+      hideRibbonLoader("mainRibbonCirc");
+      if (btn) btn.disabled = false;
+      ventDisabled = false;
       showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small>");
     });
   });
@@ -138,16 +152,20 @@ function unlockVault() {
   const inputElem = document.getElementById("vaultPassword");
   if (!inputElem) return;
   const inputPassword = inputElem.value;
+  const btn = document.getElementById("unlockBtn");
+  if (btn) btn.disabled = true;
   if (inputPassword !== "tishcancode") {
-    showCustomModal("That’s not our secret word… try again?");
+    showCustomModal("Oops, not the secret word! Try again, love.");
+    if (btn) btn.disabled = false;
     return;
   }
-  showLoading("Unlocking your heart vault...");
+  showRibbonLoader("Unlocking your vault...", "vaultRibbonCirc");
   setTimeout(()=>{
-    hideLoading();
+    hideRibbonLoader("vaultRibbonCirc", "Unlocked!");
     document.getElementById("passwordPrompt").style.display = "none";
     document.getElementById("vaultSection").style.display = "block";
     loadVaultEntries(inputPassword);
+    if (btn) btn.disabled = false;
   }, 800);
 }
 window.unlockVault = unlockVault;
@@ -159,12 +177,12 @@ function loadVaultEntries(password) {
   db.collection("nayuVault").orderBy("timestamp", "desc").get()
     .then(querySnapshot => {
       if (querySnapshot.empty) {
-        list.innerHTML = "<div class='vault-card' style='text-align:center;'>No notes yet, but I’m always here when you need me.</div>";
+        list.innerHTML = "<div class='vault-card' style='text-align:center;'>Nothing here yet. I’ll hold every memory close for you, promise. 💖</div>";
         return;
       }
       querySnapshot.forEach(doc => {
         const entryEnc = doc.data().encrypted;
-        decryptText(entryEnc, password).then(decrypted => {
+        decryptText(entryEnc, "tishcancode").then(decrypted => {
           const data = JSON.parse(decrypted);
           list.appendChild(createVaultCard(data, doc.id));
         }).catch(() => {});
@@ -176,12 +194,6 @@ function createVaultCard(data, docId) {
   const card = document.createElement("div");
   card.className = "vault-card";
   card.dataset.docId = docId;
-  // Checkbox
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.className = "vault-checkbox";
-  checkbox.dataset.docId = docId;
-  // Main content
   const contentDiv = document.createElement("div");
   contentDiv.className = "vault-card-content";
   const header = document.createElement("div");
@@ -189,7 +201,6 @@ function createVaultCard(data, docId) {
   header.textContent = `${data.date} — [${data.mood}]`;
   contentDiv.appendChild(header);
 
-  // Dots Menu with working Read/Download
   const menuBtn = document.createElement("button");
   menuBtn.className = "menu-dots";
   menuBtn.innerHTML = "&#x22EE;";
@@ -200,6 +211,7 @@ function createVaultCard(data, docId) {
   menuPopup.innerHTML = `
     <button class="menu-read">Read</button>
     <button class="menu-download">Download</button>
+    <button class="menu-delete">Delete</button>
   `;
   menuPopup.querySelector(".menu-read").onclick = e => {
     showModal(data.fullText);
@@ -213,64 +225,67 @@ function createVaultCard(data, docId) {
     menuPopup.style.display = "none";
     e.stopPropagation();
   };
+  menuPopup.querySelector(".menu-delete").onclick = e => {
+    showCustomModal("Delete this memory forever?<br><br><button onclick='confirmDeleteOne(\""+docId+"\")' class='big-btn'>Delete It</button>");
+    menuPopup.style.display = "none";
+    e.stopPropagation();
+  };
   menuBtn.onclick = function(e) {
     document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
     menuPopup.style.display = menuPopup.style.display === "block" ? "none" : "block";
     e.stopPropagation();
   };
-  card.appendChild(checkbox);
   card.appendChild(contentDiv);
   card.appendChild(menuBtn);
   card.appendChild(menuPopup);
   return card;
 }
-
-// --- DELETE FUNCTION ---
-function deleteSelected() {
-  const checkboxes = document.querySelectorAll('.vault-card input[type="checkbox"]:checked');
-  if (checkboxes.length === 0) {
-    showCustomModal("Pick what you want to let go of. I’ll be gentle.");
-    return;
-  }
-  showCustomModal("Are you sure? This will really delete them forever.<br><br><button onclick='confirmDelete()' class='big-btn'>Yes, delete</button>");
-}
-window.deleteSelected = deleteSelected;
-
-function confirmDelete() {
+window.confirmDeleteOne = function(docId) {
   closeCustomModal();
-  const checkboxes = document.querySelectorAll('.vault-card input[type="checkbox"]:checked');
-  const batch = db.batch();
-  checkboxes.forEach(cb => {
-    const docId = cb.dataset.docId;
-    if (docId) {
-      const docRef = db.collection("nayuVault").doc(docId);
-      batch.delete(docRef);
-    }
+  db.collection("nayuVault").doc(docId).delete().then(()=>{
+    showCustomModal("Deleted that memory. But I’ll remember the love!");
+    setTimeout(()=>location.reload(),800);
   });
-  batch.commit().then(() => {
-    showCustomModal("Deleted! I’m always here for your next note.");
-    setTimeout(()=>location.reload(),1200);
-  }).catch(err => showCustomModal("Error deleting: " + err.message));
-}
-window.confirmDelete = confirmDelete;
+};
 
-// --- MODAL FOR ENTRY READING ---
+function deleteAllVents() {
+  showCustomModal("Delete every memory? This can’t be undone.<br><br><button onclick='confirmDeleteAll()' class='big-btn'>Delete All</button>");
+}
+window.deleteAllVents = deleteAllVents;
+function confirmDeleteAll() {
+  closeCustomModal();
+  db.collection("nayuVault").get().then(snapshot=>{
+    let batch = db.batch();
+    snapshot.docs.forEach(doc=>{
+      batch.delete(doc.ref);
+    });
+    return batch.commit();
+  }).then(()=>{
+    showCustomModal("All gone. You can write more whenever you want, love.");
+    setTimeout(()=>location.reload(),1200);
+  });
+}
+
+// --- Modal for reading ---
 function showModal(text) {
   const modal = document.getElementById("previewModal");
   const modalText = document.getElementById("modalText");
   if (modal && modalText) {
     modalText.innerHTML = text;
     modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
   }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
     document.getElementById("previewModal").style.display = "none";
+    document.body.style.overflow = "";
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
       modal.style.display = "none";
+      document.body.style.overflow = "";
     }
   };
 }
@@ -293,7 +308,109 @@ if (document.getElementById("vaultPassword")) {
     });
 }
 
-// --- Activities / Games (on comfort.html only) ---
+// --- Activities / Games ---
+function petTheCat() {
+  const catModal = document.getElementById("catModal");
+  const theCat = document.getElementById("theCat");
+  const catMsg = document.getElementById("catMsg");
+  if (!catModal || !theCat || !catMsg) return;
+  catModal.style.display = "flex";
+  catMsg.textContent = "Tap Bixie’s nose to pet!";
+  theCat.innerHTML = `
+    <svg viewBox="0 0 90 90" width="95" height="95" fill="none">
+      <ellipse cx="45" cy="49" rx="36" ry="34" fill="#ffcb88"/>
+      <ellipse cx="23" cy="33" rx="9" ry="13" fill="#ffe7c2"/>
+      <ellipse cx="67" cy="33" rx="9" ry="13" fill="#ffe7c2"/>
+      <ellipse cx="45" cy="55" rx="23" ry="16" fill="#fff7ee"/>
+      <ellipse cx="32" cy="37" rx="3" ry="7" fill="#fff4d2"/>
+      <ellipse cx="58" cy="37" rx="3" ry="7" fill="#fff4d2"/>
+      <ellipse cx="37" cy="47" rx="3" ry="6" fill="#a77a45"/>
+      <ellipse cx="53" cy="47" rx="3" ry="6" fill="#a77a45"/>
+      <ellipse cx="45" cy="61" rx="6" ry="3" fill="#fff"/>
+      <ellipse cx="45" cy="51" rx="3" ry="2" fill="#b97234"/>
+      <ellipse cx="45" cy="59" rx="5" ry="2.1" fill="#ffcb88"/>
+      <ellipse cx="45" cy="47.5" rx="2" ry="1.4" fill="#fff"/>
+      <ellipse cx="45" cy="54" rx="2" ry="1.2" fill="#fff"/>
+      <ellipse cx="45" cy="52.3" rx="2" ry="1.1" fill="#fff"/>
+      <ellipse cx="45" cy="54.5" rx="1.3" ry="0.7" fill="#fff"/>
+      <ellipse id="bixieNose" cx="45" cy="54" rx="2.5" ry="2" fill="#ed9d64" style="cursor:pointer;"/>
+      <path d="M44 57 Q45 58.8,46 57" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
+      <path d="M32 53 Q28 54,32 56" stroke="#a77a45" stroke-width="1.2" fill="none"/>
+      <path d="M58 53 Q62 54,58 56" stroke="#a77a45" stroke-width="1.2" fill="none"/>
+      <ellipse class="bixie-blink" cx="37" cy="47" rx="1.3" ry="1.7" fill="#4a3010"/>
+      <ellipse class="bixie-blink" cx="53" cy="47" rx="1.3" ry="1.7" fill="#4a3010"/>
+    </svg>
+  `;
+  let purrs = [
+    "Bixie purrs and rubs her face on you!",
+    "She closes her eyes and smiles.",
+    "Bixie blinks and you feel loved.",
+    "She makes a happy little mew!"
+  ];
+  let times = 0;
+  theCat.querySelector("#bixieNose").onclick = function() {
+    catMsg.textContent = purrs[times % purrs.length];
+    times++;
+    theCat.style.transform = "scale(1.07)";
+    setTimeout(()=>{theCat.style.transform="";},170);
+  }
+  window.closeCat = ()=>{catModal.style.display="none";};
+}
+window.petTheCat = petTheCat;
+
+// --- Compliment Rain (slower, pop, blocks BG, disables interaction while active) ---
+let complimentRainActive = false;
+function complimentRain() {
+  if (complimentRainActive) return;
+  complimentRainActive = true;
+  const blockDiv = document.createElement("div");
+  blockDiv.style.position = "fixed";
+  blockDiv.style.top = 0;
+  blockDiv.style.left = 0;
+  blockDiv.style.width = "100vw";
+  blockDiv.style.height = "100vh";
+  blockDiv.style.zIndex = 14999;
+  blockDiv.style.background = "rgba(255,255,255,0.01)";
+  document.body.appendChild(blockDiv);
+
+  const compliments = [
+    "You are enough.", "You’re so strong.", "Your feelings are valid.",
+    "You make my world softer.", "I love your heart.", "I’m proud of you.",
+    "It’s okay to rest.", "You shine even on rough days.", "You are loved.",
+    "Your smile makes everything lighter.", "You matter to me, always.", "You can be soft here.",
+    "It's okay to be sad.", "You are never a burden.", "Tish will always listen."
+  ];
+  let total = 13, popped = 0, rainSpeed = 3600, delay = 290;
+  for (let i=0; i<total; ++i) {
+    setTimeout(()=>{
+      let el = document.createElement("div");
+      el.className = "compliment-bubble";
+      el.textContent = compliments[Math.floor(Math.random()*compliments.length)];
+      el.style.left = (6 + Math.random()*88) + "vw";
+      el.style.top = "-40px";
+      document.body.appendChild(el);
+      let end = 90 + Math.random()*13;
+      let anim = el.animate([
+        {top:"-40px", opacity:1, transform:"scale(1.07)"},
+        {top:end+"vh", opacity:0.6, transform:"scale(1.13) rotate(-4deg)"}
+      ], {duration: rainSpeed+Math.random()*1200, easing:"ease-in"});
+      el.onclick = function() {
+        el.classList.add("popped");
+        setTimeout(()=>{el.remove();},190);
+        popped++;
+        if (popped===total) finishRain();
+      };
+      setTimeout(()=>{if(el)el.classList.add("popped");if(el)el.remove(); popped++; if (popped===total) finishRain();}, rainSpeed+1400);
+    }, i*delay);
+  }
+  function finishRain() {
+    document.body.removeChild(blockDiv);
+    complimentRainActive = false;
+  }
+}
+window.complimentRain = complimentRain;
+
+// --- Breathe Modal ---
 function startBreathing() {
   const modal = document.getElementById("breathingModal");
   const instruct = document.getElementById("breathInstruct");
@@ -301,7 +418,7 @@ function startBreathing() {
   if (!modal) return;
   modal.style.display = "flex";
   let steps = [
-    {txt:"Breathe In", time: 3500, scale:1.21, color:"#fa8dc0"},
+    {txt:"Breathe In", time: 3500, scale:1.23, color:"#fa8dc0"},
     {txt:"Hold", time: 2000, scale:1.13, color:"#f7bff0"},
     {txt:"Breathe Out", time: 4000, scale:0.99, color:"#96d1ea"},
     {txt:"Hold", time: 1700, scale:1.08, color:"#ffd2ef"}
@@ -320,91 +437,6 @@ function startBreathing() {
   window.closeBreathing = () => { active=false; modal.style.display="none"; };
 }
 window.startBreathing = startBreathing;
-
-function complimentRain() {
-  const compliments = [
-    "You are enough.", "You’re so strong.", "Your feelings are valid.",
-    "You make my world softer.", "I love your heart.", "I’m proud of you.",
-    "It’s okay to rest.", "You shine even on rough days.", "You are loved."
-  ];
-  const heartSVG = `<svg class="compliment-heart" viewBox="0 0 24 22"><path d="M12 21s-5.1-3.2-8.1-7C1.4 11 0 8.7 2.1 6.5A5.7 5.7 0 0112 7a5.7 5.7 0 019.9-.5C24 8.7 22.6 11 20.1 14c-3 3.8-8.1 7-8.1 7z" fill="#ff87b2" stroke="#e055ab" stroke-width="1"/></svg>`;
-  for (let i=0; i<16; ++i) {
-    setTimeout(()=>{
-      let el = document.createElement("div");
-      el.className = "compliment-bubble";
-      let compliment = compliments[Math.floor(Math.random()*compliments.length)];
-      el.innerHTML = compliment + (Math.random() > 0.6 ? heartSVG : "");
-      el.style.left = (7 + Math.random()*83) + "vw";
-      el.style.top = "-48px";
-      el.style.zIndex = 13000;
-      el.style.fontSize = (15 + Math.random()*6) + "px";
-      el.style.transform = `rotate(${Math.floor(-13+Math.random()*26)}deg)`;
-      document.body.appendChild(el);
-
-      // SLOWER animation
-      let sway = Math.random()*40 - 20;
-      let duration = 3600+Math.random()*1500;
-      let end = 100 + Math.random()*26;
-      el.animate([
-        {top:"-48px", left:el.style.left, opacity:1, transform:el.style.transform},
-        {top:(end)+"vh", left:`calc(${el.style.left} + ${sway}px)`, opacity:0.12, transform:`${el.style.transform} scale(1.07)`}
-      ], {duration:duration, easing:"ease-in"});
-      setTimeout(()=>{if(el)el.remove();}, duration+300);
-
-      // Clicking on a compliment makes it "pop"
-      el.onclick = () => {
-        el.style.transition = "opacity 0.27s, transform 0.22s";
-        el.style.opacity = 0;
-        el.style.transform += " scale(1.2) rotate(-5deg)";
-        setTimeout(()=>el.remove(), 300);
-      };
-    }, i*270);
-  }
-}
-window.complimentRain = complimentRain;
-
-// --- Pet Bixie ---
-function petTheCat() {
-  const catModal = document.getElementById("catModal");
-  const theCat = document.getElementById("theCat");
-  const catMsg = document.getElementById("catMsg");
-  if (!catModal || !theCat || !catMsg) return;
-  catModal.style.display = "flex";
-  catMsg.textContent = "Tap Bixie to pet!";
-  theCat.innerHTML = `
-    <svg width="110" height="90" viewBox="0 0 110 90" fill="none">
-      <ellipse cx="55" cy="65" rx="34" ry="20" fill="#ffe7c2"/>
-      <ellipse cx="39" cy="38" rx="14" ry="14" fill="#ffb564"/>
-      <ellipse cx="71" cy="38" rx="14" ry="14" fill="#ffb564"/>
-      <ellipse cx="55" cy="62" rx="23" ry="13" fill="#fff7ee"/>
-      <ellipse cx="55" cy="52" rx="19" ry="9" fill="#ffd17b"/>
-      <ellipse cx="55" cy="59" rx="10" ry="5" fill="#ffb564"/>
-      <ellipse cx="46" cy="37" rx="3" ry="5" fill="#ffcf92"/>
-      <ellipse cx="64" cy="37" rx="3" ry="5" fill="#ffcf92"/>
-      <ellipse cx="52" cy="48" rx="2" ry="3" fill="#8e5c26"/>
-      <ellipse cx="58" cy="48" rx="2" ry="3" fill="#8e5c26"/>
-      <ellipse cx="55" cy="54" rx="4" ry="2" fill="#fff"/>
-      <path d="M54 50 Q55 52,56 50" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
-      <polygon points="29,19 35,31 37,24" fill="#ffb564"/>
-      <polygon points="81,19 75,31 73,24" fill="#ffb564"/>
-      <!-- cute little nose and smile -->
-      <ellipse cx="55" cy="51" rx="1.2" ry="1" fill="#c97b2b"/>
-      <path d="M54 53 Q55 54,56 53" stroke="#c97b2b" stroke-width="1" fill="none"/>
-    </svg>
-  `;
-  let purrs = [
-    "Bixie purrs and rubs you!", "She closes her eyes, so happy!", "She loves your gentle touch!", "Bixie does a tiny happy dance."
-  ];
-  let times = 0;
-  theCat.onclick = function() {
-    catMsg.textContent = purrs[times%purrs.length];
-    times++;
-    theCat.style.transform = "scale(1.07)";
-    setTimeout(()=>{theCat.style.transform="";},170);
-  }
-  window.closeCat = ()=>{catModal.style.display="none";};
-}
-window.petTheCat = petTheCat;
 
 // === COUNTDOWN TIMERS ===
 function pad(n){return n<10?'0'+n:n;}
