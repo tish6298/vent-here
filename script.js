@@ -11,19 +11,19 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- Custom Modal Alert ---
+// --- Helper: Central Modal Display ---
 function showCustomModal(msg) {
   const modal = document.getElementById('customModal');
   if (modal) {
     modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" style="margin-top:12px;" class="big-btn">OK</button>';
-    modal.style.display = "flex";
+    modal.classList.add("active");
   } else {
     alert(msg); // fallback
   }
 }
 function closeCustomModal() {
   const modal = document.getElementById('customModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) modal.classList.remove('active');
 }
 
 // --- FORMAT TOOLS ---
@@ -119,7 +119,7 @@ function decryptText(base64, password) {
   });
 }
 
-// --- VAULT ACCESS ---
+// --- VAULT ACCESS + Loader ---
 function unlockVault() {
   const inputElem = document.getElementById("vaultPassword");
   if (!inputElem) return;
@@ -129,29 +129,69 @@ function unlockVault() {
     return;
   }
   document.getElementById("passwordPrompt").style.display = "none";
-  document.getElementById("vaultSection").style.display = "block";
-  loadVaultEntries(inputPassword);
+  showVaultLoader();
+  setTimeout(()=>{
+    document.getElementById("vaultSection").style.display = "block";
+    loadVaultEntries(inputPassword);
+  }, 200); // allows loader to show
 }
 window.unlockVault = unlockVault;
+
+function showVaultLoader() {
+  let loader = document.getElementById("vaultLoader") || document.getElementById("globalLoader");
+  if (loader) loader.classList.add("active");
+  let pb = document.getElementById("vaultLoadingBar");
+  if (pb) {
+    pb.style.width = "0%";
+    let progress = 0;
+    let intv = setInterval(()=>{
+      progress = Math.min(progress + 14 + Math.random()*8, 94);
+      pb.style.width = progress + "%";
+      if(progress > 93 || !loader.classList.contains("active")) clearInterval(intv);
+    }, 170);
+  }
+}
+function hideVaultLoader() {
+  let loader = document.getElementById("vaultLoader") || document.getElementById("globalLoader");
+  if (loader) loader.classList.remove("active");
+  let pb = document.getElementById("vaultLoadingBar");
+  if (pb) pb.style.width = "100%";
+}
 
 function loadVaultEntries(password) {
   const list = document.getElementById("ventList");
   if (!list) return;
   list.innerHTML = "";
+  showVaultLoader();
   db.collection("nayuVault").orderBy("timestamp", "desc").get()
     .then(querySnapshot => {
+      hideVaultLoader();
       if (querySnapshot.empty) {
         list.innerHTML = "<div class='vault-card' style='text-align:center;'>No notes yet, but I’m always here when you need me.</div>";
         return;
       }
-      querySnapshot.forEach(doc => {
+      let docs = [];
+      querySnapshot.forEach(doc => docs.push(doc));
+      let finished = 0;
+      docs.forEach(doc => {
         const entryEnc = doc.data().encrypted;
         decryptText(entryEnc, password).then(decrypted => {
           const data = JSON.parse(decrypted);
           list.appendChild(createVaultCard(data, doc.id));
-        }).catch(() => {});
+          finished++;
+          // Animate loader as entries are rendered
+          let pb = document.getElementById("vaultLoadingBar");
+          if (pb && docs.length>1) pb.style.width = (100 * finished / docs.length) + "%";
+          if (finished === docs.length) hideVaultLoader();
+        }).catch(() => {
+          finished++;
+          if (finished === docs.length) hideVaultLoader();
+        });
       });
-    }).catch(err => showCustomModal("Could not load the vault: " + err.message));
+    }).catch(err => {
+      hideVaultLoader();
+      showCustomModal("Could not load the vault: " + err.message);
+    });
 }
 
 function createVaultCard(data, docId) {
@@ -197,7 +237,7 @@ function createVaultCard(data, docId) {
   menuPopup.querySelector(".menu-download").onclick = e => {
     let safeFilename = `${data.date.replace(/[/:,]/g, "-")} - ${data.mood}.txt`;
     safeFilename = safeFilename.replace(/[\s?<>\\:*|"]/g, '_');
-    downloadText(data.fullText, safeFilename);
+    downloadText(data.fullText.replace(/<br\s*\/?>/g, '\n').replace(/<\/?[^>]+(>|$)/g, ""), safeFilename);
     menuPopup.style.display = "none";
     const backdrop = document.getElementById("menuBackdrop");
     if (backdrop) backdrop.style.display = "none";
@@ -269,17 +309,17 @@ function showModal(text) {
   const modalText = document.getElementById("modalText");
   if (modal && modalText) {
     modalText.innerHTML = text;
-    modal.style.display = "block";
+    modal.classList.add("active");
   }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
-    document.getElementById("previewModal").style.display = "none";
+    document.getElementById("previewModal").classList.remove("active");
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
-      modal.style.display = "none";
+      modal.classList.remove("active");
     }
   };
 }
@@ -308,7 +348,7 @@ function startBreathing() {
   const instruct = document.getElementById("breathInstruct");
   const circle = document.getElementById("breathCircle");
   if (!modal) return;
-  modal.style.display = "flex";
+  modal.classList.add("active");
   let steps = [
     {txt:"Breathe In", time: 3500, scale:1.21, color:"#fa8dc0"},
     {txt:"Hold", time: 2000, scale:1.13, color:"#f7bff0"},
@@ -325,41 +365,63 @@ function startBreathing() {
     setTimeout(() => { i=(i+1)%steps.length; nextStep(); }, steps[i].time);
   }
   nextStep();
-  modal.onclick = function(e) { if(e.target===modal){ active=false; modal.style.display="none"; } };
-  window.closeBreathing = () => { active=false; modal.style.display="none"; };
+  modal.onclick = function(e) { if(e.target===modal){ active=false; modal.classList.remove("active"); } };
+  window.closeBreathing = () => { active=false; modal.classList.remove("active"); };
 }
 window.startBreathing = startBreathing;
 
+// --- Enhanced Compliment Rain ---
 function complimentRain() {
   const compliments = [
     "You are enough.", "You’re so strong.", "Your feelings are valid.",
     "You make my world softer.", "I love your heart.", "I’m proud of you.",
     "It’s okay to rest.", "You shine even on rough days.", "You are loved."
   ];
-  for (let i=0; i<14; ++i) {
+  const heartSVG = `<svg class="compliment-heart" viewBox="0 0 24 22"><path d="M12 21s-5.1-3.2-8.1-7C1.4 11 0 8.7 2.1 6.5A5.7 5.7 0 0112 7a5.7 5.7 0 019.9-.5C24 8.7 22.6 11 20.1 14c-3 3.8-8.1 7-8.1 7z" fill="#ff87b2" stroke="#e055ab" stroke-width="1"/></svg>`;
+  for (let i=0; i<16; ++i) {
     setTimeout(()=>{
       let el = document.createElement("div");
-      el.textContent = compliments[Math.floor(Math.random()*compliments.length)];
-      el.style.position = "fixed";
-      el.style.left = (6 + Math.random()*88) + "vw";
-      el.style.top = "-40px";
+      el.className = "compliment-bubble";
+      let compliment = compliments[Math.floor(Math.random()*compliments.length)];
+      el.innerHTML = compliment + (Math.random() > 0.6 ? heartSVG : "");
+      el.style.left = (7 + Math.random()*83) + "vw";
+      el.style.top = "-48px";
       el.style.zIndex = 13000;
-      el.style.background = "linear-gradient(90deg,#ffbde2 10%,#b5fffc 90%)";
-      el.style.color = "#d83a99";
-      el.style.padding = "9px 19px";
-      el.style.borderRadius = "19px";
-      el.style.fontWeight = "800";
-      el.style.fontSize = "16px";
-      el.style.opacity = "0.88";
-      el.style.boxShadow = "0 2px 9px #ffe7f68a";
+      el.style.fontSize = (15 + Math.random()*6) + "px";
+      el.style.transform = `rotate(${Math.floor(-13+Math.random()*26)}deg)`;
       document.body.appendChild(el);
-      let end = 100 + Math.random()*30;
+
+      // Cute floating animation (sway + fade)
+      let sway = Math.random()*40 - 20;
+      let duration = 2400+Math.random()*1000;
+      let end = 100 + Math.random()*26;
       el.animate([
-        {top:"-40px", opacity:1, transform:"scale(1.1)"},
-        {top:end+"vh", opacity:0, transform:"scale(1.17)"}
-      ], {duration:2200+Math.random()*900, easing:"ease-in"});
-      setTimeout(()=>{if(el)el.remove();}, 2600);
-    }, i*160);
+        {top:"-48px", left:el.style.left, opacity:1, transform:el.style.transform},
+        {top:(end)+"vh", left:`calc(${el.style.left} + ${sway}px)`, opacity:0.12, transform:`${el.style.transform} scale(1.07)`}
+      ], {duration:duration, easing:"ease-in"});
+      setTimeout(()=>{if(el)el.remove();}, duration+300);
+
+      // Clicking on a compliment makes it "pop" with sparkles & fade
+      el.onclick = () => {
+        el.style.transition = "opacity 0.27s, transform 0.22s";
+        el.style.opacity = 0;
+        el.style.transform += " scale(1.2) rotate(-5deg)";
+        setTimeout(()=>el.remove(), 300);
+        // Optional: Add a little sparkle burst!
+        let sp = document.createElement("div");
+        sp.style.position = "fixed";
+        sp.style.left = el.style.left;
+        sp.style.top = (parseInt(el.style.top)+15)+"px";
+        sp.innerHTML = `<svg width="30" height="30" style="pointer-events:none"><g>
+          <circle cx="15" cy="15" r="7" fill="#ffd6ec" opacity="0.72"/><circle cx="15" cy="15" r="2.7" fill="#ea6fbd"/>
+          <path d="M15 4L15 0M15 30L15 26M4 15L0 15M30 15L26 15M8 8L3 3M22 8L27 3M8 22L3 27M22 22L27 27" stroke="#ea6fbd" stroke-width="1.2"/>
+        </g></svg>`;
+        sp.style.zIndex = 14000;
+        document.body.appendChild(sp);
+        sp.animate([{opacity:1, transform:"scale(0.75)"}, {opacity:0, transform:"scale(1.32)"}], {duration:700});
+        setTimeout(()=>sp.remove(), 700);
+      };
+    }, i*130);
   }
 }
 window.complimentRain = complimentRain;
@@ -370,7 +432,7 @@ function petTheCat() {
   const theCat = document.getElementById("theCat");
   const catMsg = document.getElementById("catMsg");
   if (!catModal || !theCat || !catMsg) return;
-  catModal.style.display = "flex";
+  catModal.classList.add("active");
   catMsg.textContent = "Tap Bixie to pet!";
   theCat.innerHTML = `
     <svg width="110" height="90" viewBox="0 0 110 90" fill="none">
@@ -403,7 +465,7 @@ function petTheCat() {
     theCat.style.transform = "scale(1.07)";
     setTimeout(()=>{theCat.style.transform="";},170);
   }
-  window.closeCat = ()=>{catModal.style.display="none";};
+  window.closeCat = ()=>{catModal.classList.remove("active");};
 }
 window.petTheCat = petTheCat;
 
