@@ -132,8 +132,28 @@ function unlockVault() {
           header.className = "ventHeader";
           header.textContent = `${data.date} — [${data.mood}]`;
 
-          const preview = document.createElement("div");
-          preview.textContent = data.preview;
+         const preview = document.createElement("div");
+preview.textContent = data.preview;
+
+const actions = document.createElement("div");
+actions.style.marginTop = "10px";
+
+const previewBtn = document.createElement("button");
+previewBtn.textContent = "👁️ Preview";
+previewBtn.style.marginRight = "10px";
+previewBtn.onclick = () => showModal(data.fullText);
+
+const downloadBtn = document.createElement("button");
+downloadBtn.textContent = "⬇️ Download";
+downloadBtn.onclick = () => downloadText(data.fullText, `${data.date}.txt`);
+
+actions.appendChild(previewBtn);
+actions.appendChild(downloadBtn);
+
+li.appendChild(checkbox);
+li.appendChild(header);
+li.appendChild(preview);
+li.appendChild(actions);
 
           const previewBtn = document.createElement("button");
           previewBtn.textContent = "🔍 Preview";
@@ -192,4 +212,29 @@ function deleteSelected() {
     alert("Deleted selected entries.");
     location.reload();
   }).catch(err => alert("Error deleting entries: " + err.message));
+}
+function showModal(text) {
+  const modal = document.getElementById("previewModal");
+  const modalText = document.getElementById("modalText");
+  modalText.textContent = text;
+  modal.style.display = "block";
+}
+
+document.getElementById("closeModal").onclick = function () {
+  document.getElementById("previewModal").style.display = "none";
+};
+
+window.onclick = function (event) {
+  const modal = document.getElementById("previewModal");
+  if (event.target === modal) {
+    modal.style.display = "none";
+  }
+};
+
+function downloadText(content, filename) {
+  const blob = new Blob([content], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
 }
