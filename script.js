@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- HAPTIC FEEDBACK HELPER ---
+// === HAPTIC FEEDBACK ===
 function haptic(pattern = "tap") {
   if (!("vibrate" in navigator)) return;
   switch (pattern) {
@@ -37,8 +37,15 @@ function haptic(pattern = "tap") {
   }
 }
 
-// --- Helper: Central Modal Display ---
+// === POPUP/MODAL SYSTEM ===
+// Always hide all other popups before showing a new one!
+function hideAllPopups() {
+  document.querySelectorAll('.custom-modal.active,.modal.active,.activity-modal.active,.vault-loader.active')
+    .forEach(e => e.classList.remove('active'));
+  if (document.getElementById("menuBackdrop")) document.getElementById("menuBackdrop").style.display = "none";
+}
 function showCustomModal(msg) {
+  hideAllPopups();
   haptic("light");
   const modal = document.getElementById('customModal');
   if (modal) {
@@ -50,11 +57,10 @@ function showCustomModal(msg) {
 }
 function closeCustomModal() {
   haptic("light");
-  const modal = document.getElementById('customModal');
-  if (modal) modal.classList.remove('active');
+  hideAllPopups();
 }
 
-// --- FORMAT TOOLS ---
+// === FORMAT TOOLS (EDITOR) ===
 if (document.getElementById("vent")) {
   function formatDoc(cmd, val) {
     haptic("tap");
@@ -66,10 +72,10 @@ if (document.getElementById("vent")) {
     var text = (e.originalEvent || e).clipboardData.getData('text/plain');
     document.execCommand('insertHTML', false, text.replace(/\n/g,"<br>"));
   });
-  window.formatDoc = formatDoc; // For toolbar buttons
+  window.formatDoc = formatDoc;
 }
 
-// --- VENT SUBMISSION ---
+// === VENT SUBMISSION ===
 function submitVent() {
   haptic("tap");
   const moodElem = document.getElementById("mood");
@@ -82,6 +88,7 @@ function submitVent() {
     haptic("error");
     return;
   }
+  hideAllPopups();
   document.getElementById("loadingCard").style.display = "block";
   let progress = 0;
   let pb = document.getElementById("progressBar");
@@ -117,9 +124,9 @@ function submitVent() {
     });
   });
 }
-window.submitVent = submitVent; // For HTML button
+window.submitVent = submitVent;
 
-// --- AES ENCRYPTION ---
+// === AES ENCRYPTION ===
 function encryptText(text, password) {
   const enc = new TextEncoder();
   const data = enc.encode(text);
@@ -152,9 +159,10 @@ function decryptText(base64, password) {
   });
 }
 
-// --- VAULT ACCESS + Loader ---
+// === VAULT ACCESS & LOADER ===
 function unlockVault() {
   haptic("tap");
+  hideAllPopups();
   const inputElem = document.getElementById("vaultPassword");
   if (!inputElem) return;
   const inputPassword = inputElem.value;
@@ -168,13 +176,14 @@ function unlockVault() {
   setTimeout(()=>{
     document.getElementById("vaultSection").style.display = "block";
     loadVaultEntries(inputPassword);
-    setTimeout(() => haptic("success"), 600); // vault unlock "success" haptic
-  }, 200); // allows loader to show
+    setTimeout(() => haptic("success"), 400);
+  }, 400);
 }
 window.unlockVault = unlockVault;
 
 function showVaultLoader() {
-  let loader = document.getElementById("vaultLoader") || document.getElementById("globalLoader");
+  hideAllPopups();
+  let loader = document.getElementById("vaultLoader");
   if (loader) loader.classList.add("active");
   let pb = document.getElementById("vaultLoadingBar");
   if (pb) {
@@ -188,7 +197,7 @@ function showVaultLoader() {
   }
 }
 function hideVaultLoader() {
-  let loader = document.getElementById("vaultLoader") || document.getElementById("globalLoader");
+  let loader = document.getElementById("vaultLoader");
   if (loader) loader.classList.remove("active");
   let pb = document.getElementById("vaultLoadingBar");
   if (pb) pb.style.width = "100%";
@@ -215,7 +224,6 @@ function loadVaultEntries(password) {
           const data = JSON.parse(decrypted);
           list.appendChild(createVaultCard(data, doc.id));
           finished++;
-          // Animate loader as entries are rendered
           let pb = document.getElementById("vaultLoadingBar");
           if (pb && docs.length>1) pb.style.width = (100 * finished / docs.length) + "%";
           if (finished === docs.length) hideVaultLoader();
@@ -315,7 +323,7 @@ function createVaultCard(data, docId) {
   return card;
 }
 
-// --- DELETE FUNCTION ---
+// === DELETE FUNCTION ===
 function deleteSelected() {
   haptic("error");
   const checkboxes = document.querySelectorAll('.vault-card input[type="checkbox"]:checked');
@@ -350,8 +358,9 @@ function confirmDelete() {
 }
 window.confirmDelete = confirmDelete;
 
-// --- MODAL FOR ENTRY READING ---
+// === MODAL FOR ENTRY READING ===
 function showModal(text) {
+  hideAllPopups();
   haptic("light");
   const modal = document.getElementById("previewModal");
   const modalText = document.getElementById("modalText");
@@ -363,13 +372,13 @@ function showModal(text) {
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
     haptic("light");
-    document.getElementById("previewModal").classList.remove("active");
+    hideAllPopups();
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
       haptic("light");
-      modal.classList.remove("active");
+      hideAllPopups();
     }
   };
 }
@@ -393,9 +402,10 @@ if (document.getElementById("vaultPassword")) {
     });
 }
 
-// --- Activities / Games ---
+// === Activities / Games ===
 let breatheInterval = null;
 function startBreathing() {
+  hideAllPopups();
   haptic("long");
   const modal = document.getElementById("breathingModal");
   const instruct = document.getElementById("breathInstruct");
@@ -426,6 +436,7 @@ window.startBreathing = startBreathing;
 
 // --- Enhanced Compliment Rain ---
 function complimentRain() {
+  hideAllPopups();
   haptic("success");
   const compliments = [
     "You are enough.", "You’re so strong.", "Your feelings are valid.",
@@ -482,8 +493,9 @@ function complimentRain() {
 }
 window.complimentRain = complimentRain;
 
-// --- Pet Bixie (ginger baby cat) ---
+// --- Pet Bixie ---
 function petTheCat() {
+  hideAllPopups();
   haptic("tap");
   const catModal = document.getElementById("catModal");
   const theCat = document.getElementById("theCat");
@@ -549,26 +561,22 @@ function getNextOctober1() {
 function getRelStart() {
   return new Date(2023,11,1,0,0,0,0); // Dec is 11
 }
-
 function updateCountdowns() {
   let cNayu = document.getElementById("countNayu");
   let cTish = document.getElementById("countTish");
   let cRel = document.getElementById("countRel");
   if (!cNayu || !cTish || !cRel) return;
   let now = new Date();
-
   // Nayu's Birthday
   let nbd = getNextOctober23();
   let delta = Math.floor((nbd-now)/1000);
   let days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
   cNayu.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
   // Tish's Birthday
   let tbd = getNextOctober1();
   delta = Math.floor((tbd-now)/1000);
   days = Math.floor(delta/86400), hrs = Math.floor((delta%86400)/3600), min = Math.floor((delta%3600)/60), sec = delta%60;
   cTish.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
-
   // Relationship counter (since)
   let rel = getRelStart();
   delta = Math.floor((now-rel)/1000);
@@ -576,4 +584,3 @@ function updateCountdowns() {
   cRel.textContent = `${pad(days)}d ${pad(hrs)}h ${pad(min)}m ${pad(sec)}s`;
 }
 if(document.getElementById("countNayu")) setInterval(updateCountdowns, 1000), updateCountdowns();
-
