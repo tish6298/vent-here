@@ -69,66 +69,8 @@ select:focus, input[type="password"]:focus {
   background: #fce3f5;
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 7px;
-  margin-bottom: 4px;
-  font-size: 17px;
-  padding-bottom: 4px;
-}
-
-.toolbar button, .toolbar select {
-  background: #ffd6ec;
-  border: 1px solid #ffd6ec;
-  color: #b963bb;
-  font-size: 17px;
-  font-family: inherit;
-  border-radius: 6px;
-  padding: 5px 9px;
-  cursor: pointer;
-  margin-right: 2px;
-  transition: background 0.17s, color 0.17s;
-  outline: none;
-}
-.toolbar button:hover, .toolbar select:focus {
-  background: #ffbde2;
-  color: #ea6fbd;
-}
-
-#fontSelect {
-  width: 75px;
-  min-width: 75px;
-}
-
-.vent-area {
-  width: 100%;
-  min-height: 97px;
-  max-height: 280px;
-  background: #fff7fb;
-  border-radius: 10px;
-  border: 1.3px solid #ffb4e6;
-  box-shadow: 0 1px 6px #efb7d918;
-  margin-bottom: 8px;
-  margin-top: 2px;
-  padding: 11px 14px;
-  font-size: 16px;
-  font-family: inherit;
-  line-height: 1.43;
-  color: #382449;
-  outline: none;
-  overflow-y: auto;
-  resize: vertical;
-}
-.vent-area:empty:before {
-  content: attr(data-placeholder);
-  color: #bba1b6;
-  font-style: italic;
-  pointer-events: none;
-}
-
-.big-btn, .vault-btn {
+/* Fancy Unlock Button */
+#unlockBtn, .big-btn, .vault-btn {
   background: linear-gradient(90deg,#ff87b2 10%,#fec3e7 90%);
   color: #fff;
   padding: 13px 0;
@@ -141,12 +83,16 @@ select:focus, input[type="password"]:focus {
   cursor: pointer;
   letter-spacing: 0.6px;
   box-shadow: 0 2px 11px #f6b3e422;
-  transition: background .18s, box-shadow .17s;
+  transition: background .18s, box-shadow .17s, transform 0.1s;
 }
-.big-btn:hover, .vault-btn:hover {
+#unlockBtn:active, .big-btn:active, .vault-btn:active {
+  transform: scale(0.97);
+}
+.big-btn:hover, .vault-btn:hover, #unlockBtn:hover {
   background: linear-gradient(90deg,#e867a1 10%,#d9a7e2 90%);
   box-shadow: 0 4px 16px #ea6fbd26;
 }
+
 .delete-btn {
   background: linear-gradient(90deg,#ffb6c1 10%,#ea94d3 90%);
   margin-top: 18px;
@@ -164,18 +110,33 @@ select:focus, input[type="password"]:focus {
   line-height: 1.35;
 }
 
-.loading-card {
+/* --- Fancy centered loading overlay for vault --- */
+.vault-loading-overlay {
   display: none;
   position: fixed;
-  left: 50%; top: 50%; transform: translate(-50%,-50%);
-  min-width: 240px;
-  background: #fff7fb;
-  border-radius: 16px;
-  box-shadow: 0 4px 40px #ffbde255;
-  padding: 32px 23px 26px 23px;
+  left:0; top:0; width:100vw; height:100vh;
+  background: rgba(255, 225, 245, 0.61);
+  z-index: 16000;
+  justify-content: center;
+  align-items: center;
+}
+.vault-loading-overlay.active {
+  display: flex !important;
+}
+.vault-loading-content {
+  background: #fff6fa;
+  border-radius: 22px;
+  box-shadow: 0 7px 40px #eab5e7bb;
+  padding: 45px 30px 36px 30px;
+  margin: 7vw auto 0 auto;
+  width: 85vw; max-width: 340px;
   text-align: center;
-  z-index: 10500;
-  animation: fadeIn .22s;
+  animation: fadeIn 0.24s;
+}
+@media (max-width:600px){
+  .vault-loading-content {
+    width:92vw; max-width:370px; padding: 36px 7vw 25px 7vw;
+  }
 }
 .loader-heart {
   width: 42px;
@@ -223,20 +184,29 @@ select:focus, input[type="password"]:focus {
   border-radius: 9px;
 }
 
-.custom-modal {
+/* --- Center ALL popups, modals --- */
+.custom-modal,
+.activity-modal,
+.modal {
   display: none;
   position: fixed;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  z-index: 11000;
-  background: rgba(255,218,242,0.2);
-  align-items: center; justify-content: center;
+  left:0; top:0; width:100vw; height:100vh;
+  z-index: 12000;
+  background: rgba(255,218,242,0.21);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.custom-modal.active,
+.activity-modal.active,
+.modal.active {
+  display: flex !important;
 }
 .custom-modal .modal-content {
   background: #fff6fa;
   border-radius: 18px;
   box-shadow: 0 5px 29px #eab5e7bb;
   padding: 32px 26px 22px 26px;
-  margin: 17vw auto 0 auto;
   width: 87vw; max-width: 330px;
   text-align: center;
   font-size: 17px;
@@ -244,6 +214,8 @@ select:focus, input[type="password"]:focus {
   color: #ea6fbd;
   position: relative;
   line-height: 1.44;
+  margin: 0 auto;
+  animation: fadeIn 0.2s;
 }
 .custom-modal .modal-content::after {
   content: '';
@@ -255,18 +227,8 @@ select:focus, input[type="password"]:focus {
   opacity: 0.5;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 10000;
-  left: 0; top: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(255, 202, 232, 0.12);
-  transition: background .21s;
-}
 .modal-content.glassy-modal {
   background: rgba(255,255,255,0.97);
-  margin: 8vw auto 0 auto;
   padding: 28px 13px 16px 13px;
   border-radius: 16px;
   width: 94vw;
@@ -275,10 +237,11 @@ select:focus, input[type="password"]:focus {
   animation: slideUpModal .21s cubic-bezier(.6,1.2,.7,1.08);
   position: relative;
   backdrop-filter: blur(2px);
+  text-align: center;
+  margin: 0 auto;
 }
 @media (max-width: 600px) {
   .modal-content.glassy-modal {
-    margin-top: 22vw;
     padding: 16px 4vw 14px 4vw;
   }
 }
@@ -479,6 +442,7 @@ select:focus, input[type="password"]:focus {
   z-index: 12000;
   background: rgba(255, 202, 232, 0.19);
   align-items: center; justify-content: center;
+  flex-direction: column;
 }
 .activity-content {
   background: #fff;
@@ -565,4 +529,44 @@ select:focus, input[type="password"]:focus {
     gap: 10px;
   }
   .countdown-card { min-width: unset; }
+}
+
+/* Compliment Rain Enhanced */
+.compliment-bubble {
+  position: fixed;
+  min-width: 70px;
+  padding: 8px 18px 10px 18px;
+  font-size: 17px;
+  border-radius: 32px;
+  font-weight: 800;
+  background: linear-gradient(90deg,#ffbde2 10%,#b5fffc 90%);
+  color: #d83a99;
+  box-shadow: 0 3px 14px #ffe7f68a;
+  opacity: 0.93;
+  user-select: none;
+  z-index: 13000;
+  transition: filter 0.13s, transform 0.07s;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform, filter, opacity;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.compliment-bubble:hover {
+  filter: brightness(1.13) saturate(1.5) drop-shadow(0 2px 6px #ffbde299);
+  transform: scale(1.08) rotate(-2deg);
+}
+.compliment-heart {
+  display: inline-block;
+  width: 22px; height: 20px;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: pulseHeart 1.5s infinite;
+}
+@keyframes pulseHeart {
+  0% { transform: scale(1);}
+  25% { transform: scale(1.12);}
+  50% { transform: scale(1.08);}
+  100% { transform: scale(1);}
 }
