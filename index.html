@@ -29,7 +29,14 @@
 
     <button onclick="submitVent()">Submit</button>
     <p class="info">Everything you say here is just for me to understand better. You're safe.</p>
-
+<!-- Loading and success overlay -->
+<div id="overlay">
+  <div id="loader"></div>
+  <div id="successMessage">
+    <div class="checkmark">&#10003;</div>
+    <p>Successfully Vented!</p>
+  </div>
+</div>
     <!-- Vault Access Button -->
     <button onclick="window.location.href='vault.html'" style="margin-top: 20px;">🔒 Open Vault</button>
   </div>
