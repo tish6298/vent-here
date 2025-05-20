@@ -572,6 +572,6 @@ select:focus, input[type="password"]:focus {
   opacity: 0.9;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px);}
+  from { opacity: 0; transform: translateY(-25px);}
   to { opacity: 1; transform: translateY(0);}
 }
