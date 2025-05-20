@@ -36,107 +36,52 @@ body {
   }
 }
 
-h1, h2, .comfort-title {
-  text-align: center;
-  margin-bottom: 12px;
-  font-weight: 900;
-  color: #ea6fbd;
-  letter-spacing: 0.4px;
-}
-
-label {
-  display: block;
-  margin-top: 18px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #b763a6;
-}
-
-select, input[type="password"] {
-  width: 100%;
-  padding: 12px 13px;
-  margin-top: 8px;
-  border: 1.1px solid #ffb4e6;
-  border-radius: 8px;
-  font-size: 16px;
-  background: rgba(255,255,255,0.98);
-  transition: border .19s;
-}
-
-select:focus, input[type="password"]:focus {
-  border: 1.5px solid #ea9fc6;
-  outline: none;
-  background: #fce3f5;
-}
-
-/* Fancy Unlock Button */
-#unlockBtn, .big-btn, .vault-btn {
-  background: linear-gradient(90deg,#ff87b2 10%,#fec3e7 90%);
-  color: #fff;
-  padding: 13px 0;
-  border: none;
-  border-radius: 9px;
-  margin-top: 20px;
-  width: 100%;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.6px;
-  box-shadow: 0 2px 11px #f6b3e422;
-  transition: background .18s, box-shadow .17s, transform 0.1s;
-}
-#unlockBtn:active, .big-btn:active, .vault-btn:active {
-  transform: scale(0.97);
-}
-.big-btn:hover, .vault-btn:hover, #unlockBtn:hover {
-  background: linear-gradient(90deg,#e867a1 10%,#d9a7e2 90%);
-  box-shadow: 0 4px 16px #ea6fbd26;
-}
-
-.delete-btn {
-  background: linear-gradient(90deg,#ffb6c1 10%,#ea94d3 90%);
-  margin-top: 18px;
-  font-weight: 700;
-}
-.delete-btn:hover {
-  background: linear-gradient(90deg,#f67fa7 10%,#b663b3 90%);
-}
-.info, .love-message {
-  margin-top: 16px;
-  font-style: italic;
-  color: #c96ab5;
-  font-size: 15.2px;
-  text-align: center;
-  line-height: 1.35;
-}
-
-/* --- Fancy centered loading overlay for vault --- */
-.vault-loading-overlay {
+/* Central Modal/Popup system */
+.custom-modal, .modal, .activity-modal, .vault-loader {
   display: none;
   position: fixed;
-  left:0; top:0; width:100vw; height:100vh;
-  background: rgba(255, 225, 245, 0.61);
-  z-index: 16000;
-  justify-content: center;
-  align-items: center;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  z-index: 14000;
+  background: rgba(255,218,242,0.19);
+  align-items: center; justify-content: center;
 }
-.vault-loading-overlay.active {
+.custom-modal.active,
+.modal.active,
+.activity-modal.active,
+.vault-loader.active {
   display: flex !important;
 }
-.vault-loading-content {
+
+.custom-modal .modal-content {
   background: #fff6fa;
-  border-radius: 22px;
-  box-shadow: 0 7px 40px #eab5e7bb;
-  padding: 45px 30px 36px 30px;
-  margin: 7vw auto 0 auto;
-  width: 85vw; max-width: 340px;
+  border-radius: 18px;
+  box-shadow: 0 5px 29px #eab5e7bb;
+  padding: 32px 26px 22px 26px;
+  margin: 17vw auto 0 auto;
+  width: 87vw; max-width: 330px;
   text-align: center;
-  animation: fadeIn 0.24s;
+  font-size: 17px;
+  font-weight: 700;
+  color: #ea6fbd;
+  position: relative;
+  line-height: 1.44;
 }
-@media (max-width:600px){
-  .vault-loading-content {
-    width:92vw; max-width:370px; padding: 36px 7vw 25px 7vw;
-  }
+.custom-modal .modal-content::after {
+  content: '';
+  display: block;
+  margin: 18px auto 0 auto;
+  width: 55px; height: 6px;
+  border-radius: 3px;
+  background: #ffd6ec;
+  opacity: 0.5;
+}
+
+.vault-loader {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,218,242,0.39);
 }
 .loader-heart {
   width: 42px;
@@ -175,6 +120,7 @@ select:focus, input[type="password"]:focus {
   background: #ffd6ec;
   border-radius: 9px;
   overflow: hidden;
+  margin-bottom: 3px;
 }
 .loading-bar-fill {
   width: 0%;
@@ -184,118 +130,138 @@ select:focus, input[type="password"]:focus {
   border-radius: 9px;
 }
 
-/* --- Center ALL popups, modals --- */
-.custom-modal,
-.activity-modal,
-.modal {
-  display: none;
-  position: fixed;
-  left:0; top:0; width:100vw; height:100vh;
-  z-index: 12000;
-  background: rgba(255,218,242,0.21);
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-.custom-modal.active,
-.activity-modal.active,
-.modal.active {
-  display: flex !important;
-}
-.custom-modal .modal-content {
-  background: #fff6fa;
-  border-radius: 18px;
-  box-shadow: 0 5px 29px #eab5e7bb;
-  padding: 32px 26px 22px 26px;
-  width: 87vw; max-width: 330px;
+h1, h2, .comfort-title {
   text-align: center;
+  margin-bottom: 12px;
+  font-weight: 900;
+  color: #ea6fbd;
+  letter-spacing: 0.4px;
+}
+
+label {
+  display: block;
+  margin-top: 18px;
+  font-weight: 700;
+  font-size: 16px;
+  color: #b763a6;
+}
+
+select, input[type="password"], .themed-input {
+  width: 100%;
+  padding: 12px 13px;
+  margin-top: 8px;
+  border: 1.1px solid #ffb4e6;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(255,255,255,0.98);
+  transition: border .19s;
+  font-family: inherit;
+}
+
+select:focus, input[type="password"]:focus, .themed-input:focus {
+  border: 1.5px solid #ea9fc6;
+  outline: none;
+  background: #fce3f5;
+}
+
+/* Editor toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  margin-bottom: 4px;
+  font-size: 17px;
+  padding-bottom: 4px;
+}
+.toolbar button, .toolbar select {
+  background: #ffd6ec;
+  border: 1px solid #ffd6ec;
+  color: #b963bb;
+  font-size: 17px;
+  font-family: inherit;
+  border-radius: 6px;
+  padding: 5px 9px;
+  cursor: pointer;
+  margin-right: 2px;
+  transition: background 0.17s, color 0.17s;
+  outline: none;
+}
+.toolbar button:hover, .toolbar select:focus {
+  background: #ffbde2;
+  color: #ea6fbd;
+}
+#fontSelect {
+  width: 75px;
+  min-width: 75px;
+}
+
+/* Editor area, with placeholder fix for all browsers */
+.vent-area {
+  width: 100%;
+  min-height: 97px;
+  max-height: 280px;
+  background: #fff7fb;
+  border-radius: 10px;
+  border: 1.3px solid #ffb4e6;
+  box-shadow: 0 1px 6px #efb7d918;
+  margin-bottom: 8px;
+  margin-top: 2px;
+  padding: 11px 14px;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1.43;
+  color: #382449;
+  outline: none;
+  overflow-y: auto;
+  resize: vertical;
+}
+.vent-area:empty:before {
+  content: attr(data-placeholder);
+  color: #bba1b6;
+  font-style: italic;
+  pointer-events: none;
+  display: block;
+}
+
+/* Buttons */
+.big-btn, .vault-btn, .delete-btn, #unlockBtn {
+  background: linear-gradient(90deg,#ff87b2 10%,#fec3e7 90%);
+  color: #fff;
+  padding: 13px 0;
+  border: none;
+  border-radius: 9px;
+  margin-top: 20px;
+  width: 100%;
   font-size: 17px;
   font-weight: 700;
-  color: #ea6fbd;
-  position: relative;
-  line-height: 1.44;
-  margin: 0 auto;
-  animation: fadeIn 0.2s;
-}
-.custom-modal .modal-content::after {
-  content: '';
-  display: block;
-  margin: 18px auto 0 auto;
-  width: 55px; height: 6px;
-  border-radius: 3px;
-  background: #ffd6ec;
-  opacity: 0.5;
-}
-
-.modal-content.glassy-modal {
-  background: rgba(255,255,255,0.97);
-  padding: 28px 13px 16px 13px;
-  border-radius: 16px;
-  width: 94vw;
-  max-width: 400px;
-  box-shadow: 0 9px 44px #ecb8e27a;
-  animation: slideUpModal .21s cubic-bezier(.6,1.2,.7,1.08);
-  position: relative;
-  backdrop-filter: blur(2px);
-  text-align: center;
-  margin: 0 auto;
-}
-@media (max-width: 600px) {
-  .modal-content.glassy-modal {
-    padding: 16px 4vw 14px 4vw;
-  }
-}
-@keyframes slideUpModal {
-  from { transform: translateY(55px); opacity:0;}
-  to { transform: translateY(0); opacity:1;}
-}
-.preview-header {
-  text-align: center;
-  font-size: 18.5px;
-  color: #ea6fbd;
-  font-weight: 800;
-  margin-bottom: 13px;
-  letter-spacing: .5px;
-}
-.preview-body {
-  color: #93467c;
-  font-size: 16.7px;
-  line-height: 1.62;
-  min-height: 38px;
-  padding: 0 1vw;
-  font-weight: 500;
-  white-space: pre-wrap;
-  word-break: break-word;
-  text-align: left;
-}
-.modal-footer {
-  text-align: center;
-  margin-top: 17px;
-  font-size: 15.6px;
-  color: #e589b4;
-  font-weight: 700;
-  letter-spacing: .2px;
-  opacity: 0.9;
-}
-.close-button {
-  color: #ff87b2;
-  float: right;
-  font-size: 32px;
-  font-weight: 800;
   cursor: pointer;
-  position: absolute;
-  top: 10px; right: 13px;
-  transition: color .13s;
+  letter-spacing: 0.6px;
+  box-shadow: 0 2px 11px #f6b3e422;
+  transition: background .18s, box-shadow .17s;
 }
-.close-button:hover {
-  color: #e567a8;
+.big-btn:hover, .vault-btn:hover, #unlockBtn:hover {
+  background: linear-gradient(90deg,#e867a1 10%,#d9a7e2 90%);
+  box-shadow: 0 4px 16px #ea6fbd26;
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-12px);}
-  to { opacity: 1; transform: translateY(0);}
+.delete-btn {
+  background: linear-gradient(90deg,#ffb6c1 10%,#ea94d3 90%);
+  margin-top: 18px;
+  font-weight: 700;
+}
+.delete-btn:hover {
+  background: linear-gradient(90deg,#f67fa7 10%,#b663b3 90%);
+}
+.info, .love-message {
+  margin-top: 16px;
+  font-style: italic;
+  color: #c96ab5;
+  font-size: 15.2px;
+  text-align: center;
+  line-height: 1.35;
 }
 
-/* --- Vault cards --- */
+/* Vault cards and list */
 .vault-list-title {
   font-size: 18px;
   font-weight: 800;
@@ -404,7 +370,87 @@ select:focus, input[type="password"]:focus {
   color: #d83a99;
 }
 
-/* --- Activities/Comfort Corner --- */
+/* Modal for entry reading */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 14000;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(255, 202, 232, 0.12);
+  transition: background .21s;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content.glassy-modal {
+  background: rgba(255,255,255,0.97);
+  margin: 8vw auto 0 auto;
+  padding: 28px 13px 16px 13px;
+  border-radius: 16px;
+  width: 94vw;
+  max-width: 400px;
+  box-shadow: 0 9px 44px #ecb8e27a;
+  animation: slideUpModal .21s cubic-bezier(.6,1.2,.7,1.08);
+  position: relative;
+  backdrop-filter: blur(2px);
+}
+@media (max-width: 600px) {
+  .modal-content.glassy-modal {
+    margin-top: 22vw;
+    padding: 16px 4vw 14px 4vw;
+  }
+}
+@keyframes slideUpModal {
+  from { transform: translateY(55px); opacity:0;}
+  to { transform: translateY(0); opacity:1;}
+}
+.preview-header {
+  text-align: center;
+  font-size: 18.5px;
+  color: #ea6fbd;
+  font-weight: 800;
+  margin-bottom: 13px;
+  letter-spacing: .5px;
+}
+.preview-body {
+  color: #93467c;
+  font-size: 16.7px;
+  line-height: 1.62;
+  min-height: 38px;
+  padding: 0 1vw;
+  font-weight: 500;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+}
+.modal-footer {
+  text-align: center;
+  margin-top: 17px;
+  font-size: 15.6px;
+  color: #e589b4;
+  font-weight: 700;
+  letter-spacing: .2px;
+  opacity: 0.9;
+}
+.close-button {
+  color: #ff87b2;
+  float: right;
+  font-size: 32px;
+  font-weight: 800;
+  cursor: pointer;
+  position: absolute;
+  top: 10px; right: 13px;
+  transition: color .13s;
+}
+.close-button:hover {
+  color: #e567a8;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-12px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* --- Comfort Corner --- */
 .comfort-corner {
   margin-top: 35px;
   padding: 21px 8px 13px 8px;
@@ -442,7 +488,6 @@ select:focus, input[type="password"]:focus {
   z-index: 12000;
   background: rgba(255, 202, 232, 0.19);
   align-items: center; justify-content: center;
-  flex-direction: column;
 }
 .activity-content {
   background: #fff;
@@ -491,6 +536,32 @@ select:focus, input[type="password"]:focus {
   font-weight: 700;
   min-height: 24px;
 }
+
+/* Compliment Rain */
+.compliment-bubble {
+  position: fixed;
+  background: linear-gradient(90deg,#ffbde2 10%,#b5fffc 90%);
+  color: #d83a99;
+  padding: 9px 19px;
+  border-radius: 19px;
+  font-weight: 800;
+  font-size: 16px;
+  opacity: 0.88;
+  box-shadow: 0 2px 9px #ffe7f68a;
+  user-select: none;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: auto;
+}
+.compliment-heart {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  margin-left: 7px;
+  margin-top: -2px;
+  display: inline-block;
+}
+
+/* --- Countdown Cards --- */
 .countdowns {
   display: flex;
   gap: 12px;
@@ -529,44 +600,4 @@ select:focus, input[type="password"]:focus {
     gap: 10px;
   }
   .countdown-card { min-width: unset; }
-}
-
-/* Compliment Rain Enhanced */
-.compliment-bubble {
-  position: fixed;
-  min-width: 70px;
-  padding: 8px 18px 10px 18px;
-  font-size: 17px;
-  border-radius: 32px;
-  font-weight: 800;
-  background: linear-gradient(90deg,#ffbde2 10%,#b5fffc 90%);
-  color: #d83a99;
-  box-shadow: 0 3px 14px #ffe7f68a;
-  opacity: 0.93;
-  user-select: none;
-  z-index: 13000;
-  transition: filter 0.13s, transform 0.07s;
-  pointer-events: auto;
-  cursor: pointer;
-  will-change: transform, filter, opacity;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.compliment-bubble:hover {
-  filter: brightness(1.13) saturate(1.5) drop-shadow(0 2px 6px #ffbde299);
-  transform: scale(1.08) rotate(-2deg);
-}
-.compliment-heart {
-  display: inline-block;
-  width: 22px; height: 20px;
-  margin-left: 2px;
-  vertical-align: middle;
-  animation: pulseHeart 1.5s infinite;
-}
-@keyframes pulseHeart {
-  0% { transform: scale(1);}
-  25% { transform: scale(1.12);}
-  50% { transform: scale(1.08);}
-  100% { transform: scale(1);}
 }
