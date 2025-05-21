@@ -2,41 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nayu’s Memories Vault — Sicrit, Promise</title>
+  <title>Nayu’s Cozy Corner 🌷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="container">
-    <h1>Your Love Notes Vault 💌</h1>
-    <div class="subtitle">All your precious words are locked safe here, always.</div>
-    <div id="passwordPrompt">
-      <label for="vaultPassword" class="pink-label">What’s our secret word?</label>
-      <input type="password" id="vaultPassword" placeholder="Type it here..." class="themed-input">
-      <button class="big-btn" id="unlockBtn" onclick="unlockVault()">Unlock</button>
+    <h1>Your Heart Vault 💌</h1>
+    <div class="subtitle">Your most private words, safely kept forever. Only you and Tish can see this.</div>
+    <button class="big-btn" onclick="window.location.href='index.html'">Back to Cozy Corner</button>
+    <div id="ventList"></div>
+    <div id="loadingCard" class="center-modal" aria-modal="true" role="dialog">
+      <div class="ribbon-loader-box">
+        <div class="ribbon">Loading your vault...</div>
+        <div class="ribbon-loader-circ" id="vaultRibbonCirc"></div>
+      </div>
     </div>
-    <div id="vaultSection" style="display: none;">
-      <div class="vault-list-title">All Your Memories, in one place:</div>
-      <div class="vault-list" id="ventList"></div>
-      <button onclick="deleteAllVents()" class="delete-btn">Delete All</button>
-      <button class="back-btn" onclick="window.location.href='index.html'">Back to Venting</button>
+    <div id="customModal" class="custom-modal" aria-modal="true" role="dialog"></div>
+    <div id="menuBackdrop" class="menu-backdrop"></div>
+    <div id="previewModal" class="center-modal">
+      <div class="modal-content glassy-modal">
+        <span id="closeModal" class="close-button" tabindex="0" aria-label="Close">&times;</span>
+        <div id="modalText"></div>
+      </div>
     </div>
-  </div>
-  <div id="vaultLoader" class="center-modal">
-    <div class="ribbon-loader-box">
-      <div class="ribbon">Unlocking your vault...</div>
-      <div class="ribbon-loader-circ" id="vaultRibbonCirc"></div>
-    </div>
-  </div>
-  <div id="previewModal" class="modal">
-    <div class="modal-content glassy-modal">
-      <span id="closeModal" class="close-button">&times;</span>
-      <div class="preview-header">You wrote:</div>
-      <div id="modalText" class="preview-body"></div>
-      <div class="modal-footer">Safe forever with Tish. 💗</div>
+    <div class="delete-all-wrap">
+      <button class="delete-btn" onclick="deleteAllVents()">Delete All Memories</button>
     </div>
   </div>
-  <div id="customModal" class="custom-modal"><div class="modal-content"></div></div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
