@@ -25,7 +25,6 @@ function startBreathing() {
 }
 window.startBreathing = startBreathing;
 
-// Heart affirmations
 function affirmationHearts() {
   const affirmations = [
     "You are loved.", "You matter.", "You are beautiful.", "You are worthy.",
@@ -43,71 +42,63 @@ function affirmationHearts() {
       el.style.fontSize = (17 + Math.random()*6) + "px";
       el.style.top = "-50px";
       document.body.appendChild(el);
-      let end = 85 + Math.random()*14;
+      let end = 85 + Math.random()*12;
       el.animate([
-        {top:"-50px", opacity:1, transform:"scale(1.07)"},
+        {top:"-50px", opacity:1, transform:"scale(1.09)"},
         {top:end+"vh", opacity:1, transform:"scale(1.15)"},
-        {top:end+"vh", opacity:0, transform:"scale(1.26)"}
+        {top:end+"vh", opacity:0, transform:"scale(1.19)"}
       ], {duration:dur, easing:"ease-in"});
       el.onclick = () => {
         el.classList.add("popped");
-        setTimeout(()=>{if(el)el.remove();}, 220);
+        setTimeout(()=>{if(el)el.remove();}, 250);
       };
-      setTimeout(()=>{if(el)el.remove();}, dur+140);
-    }, i*300);
+      setTimeout(()=>{if(el)el.remove();}, dur+160);
+    }, i*260);
   }
   document.body.style.pointerEvents = "none";
-  setTimeout(() => { document.body.style.pointerEvents = ""; }, count * 300 + dur + 150);
+  setTimeout(() => { document.body.style.pointerEvents = ""; }, count * 260 + dur + 200);
 }
 window.affirmationHearts = affirmationHearts;
 
-// Cute Garfield-like cat face (SVG)
+// Cat: Cute Garfield Face
 function petTheCat() {
   const catModal = document.getElementById("catModal");
   const theCat = document.getElementById("theCat");
   const catMsg = document.getElementById("catMsg");
   if (!catModal || !theCat || !catMsg) return;
   catModal.classList.add("active");
-  catMsg.textContent = "Tap Bixie to pet!";
+  catMsg.textContent = "Tap Garfield to pet!";
   theCat.innerHTML = `
-  <svg width="96" height="96" viewBox="0 0 96 96">
-    <ellipse cx="48" cy="56" rx="35" ry="30" fill="#ffe7c2" stroke="#d5b081" stroke-width="2"/>
-    <!-- Cheeks -->
-    <ellipse cx="33" cy="70" rx="9" ry="8" fill="#ffcf9b" opacity="0.7"/>
-    <ellipse cx="63" cy="70" rx="9" ry="8" fill="#ffcf9b" opacity="0.7"/>
-    <!-- Eyes -->
-    <ellipse cx="38" cy="54" rx="6" ry="9" fill="#fff"/>
-    <ellipse cx="58" cy="54" rx="6" ry="9" fill="#fff"/>
-    <ellipse cx="38" cy="57" rx="2.4" ry="4" fill="#222"/>
-    <ellipse cx="58" cy="57" rx="2.4" ry="4" fill="#222"/>
-    <ellipse cx="38" cy="55" rx="1" ry="1.6" fill="#fff"/>
-    <ellipse cx="58" cy="55" rx="1" ry="1.6" fill="#fff"/>
-    <!-- Nose -->
-    <ellipse cx="48" cy="67" rx="2.2" ry="1.5" fill="#ff7c80" />
-    <!-- Mouth -->
-    <path d="M45 72 Q48 76, 51 72" stroke="#d2829b" stroke-width="2" fill="none"/>
-    <!-- Whiskers -->
-    <path d="M30 67 Q23 70, 32 72" stroke="#d5b081" stroke-width="1.4" fill="none"/>
-    <path d="M30 72 Q24 74, 33 76" stroke="#d5b081" stroke-width="1.1" fill="none"/>
-    <path d="M66 67 Q73 70, 64 72" stroke="#d5b081" stroke-width="1.4" fill="none"/>
-    <path d="M66 72 Q72 74, 63 76" stroke="#d5b081" stroke-width="1.1" fill="none"/>
-    <!-- Ears -->
-    <polygon points="19,38 33,18 41,37" fill="#ffe7c2" stroke="#d5b081" stroke-width="1"/>
-    <polygon points="77,38 63,18 55,37" fill="#ffe7c2" stroke="#d5b081" stroke-width="1"/>
-    <!-- Garfield stripes -->
-    <rect x="44" y="35" width="2" height="12" fill="#ffb441" rx="1"/>
-    <rect x="50" y="35" width="2" height="12" fill="#ffb441" rx="1"/>
-    <rect x="47" y="33" width="2" height="7" fill="#ffb441" rx="1"/>
-  </svg>
+    <svg width="84" height="84" viewBox="0 0 96 96" fill="none">
+      <!-- Garfield ears -->
+      <ellipse cx="29" cy="32" rx="13" ry="20" fill="#ffe7c2" stroke="#d5b081" stroke-width="1.4"/>
+      <ellipse cx="67" cy="32" rx="13" ry="20" fill="#ffe7c2" stroke="#d5b081" stroke-width="1.4"/>
+      <!-- Face base -->
+      <ellipse cx="48" cy="53" rx="36" ry="31" fill="#ffe7c2" stroke="#d5b081" stroke-width="2.1"/>
+      <!-- Eyes -->
+      <ellipse cx="38" cy="54" rx="8" ry="10" fill="#fff"/>
+      <ellipse cx="58" cy="54" rx="8" ry="10" fill="#fff"/>
+      <ellipse cx="39.5" cy="58.5" rx="2.7" ry="3.2" fill="#222"/>
+      <ellipse cx="58.5" cy="58.5" rx="2.7" ry="3.2" fill="#222"/>
+      <!-- Nose -->
+      <ellipse cx="48" cy="66" rx="5" ry="3" fill="#ffb441"/>
+      <!-- Mouth -->
+      <path d="M44 70 Q48 74 52 70" stroke="#d29657" stroke-width="2" fill="none"/>
+      <ellipse cx="48" cy="72" rx="2.6" ry="0.7" fill="#d29657"/>
+      <!-- Garfield stripes -->
+      <rect x="44" y="35" width="2" height="12" fill="#ffb441" rx="1"/>
+      <rect x="50" y="35" width="2" height="12" fill="#ffb441" rx="1"/>
+      <rect x="47" y="33" width="2" height="7" fill="#ffb441" rx="1"/>
+    </svg>
   `;
   let purrs = [
-    "Bixie purrs and rubs you!", "She closes her eyes, so happy!", "She loves your gentle touch!", "Bixie does a tiny happy dance."
+    "Garfield purrs and rubs you!", "He closes his eyes, so happy!", "He loves your gentle touch!", "Garfield smiles lazily."
   ];
   let times = 0;
   theCat.onclick = function() {
     catMsg.textContent = purrs[times%purrs.length];
     times++;
-    theCat.style.transform = "scale(1.09)";
+    theCat.style.transform = "scale(1.11)";
     setTimeout(()=>{theCat.style.transform="";},180);
   }
   window.closeCat = ()=>{catModal.classList.remove("active");};
