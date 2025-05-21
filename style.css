@@ -1,40 +1,65 @@
 @import url('https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap');
+
 html { font-size: 90%; }
-@media (max-width: 600px) { html { font-size: 85%; } }
+@media (max-width: 600px) { html { font-size: 84%; } }
+
 body {
   font-family: 'Quicksand', 'Poppins', 'Segoe UI', 'Caveat', 'Pacifico', Arial, sans-serif;
+  background: #f9e6f8;
+  min-height: 100vh;
+  margin: 0; padding: 0;
   color: #382449;
-  min-height: 100vh; margin: 0; padding: 0;
   overflow-x: hidden;
-  background: none !important;
-  z-index: 2;
   position: relative;
 }
-
 .background-video {
-  position: fixed; z-index: 0; left: 0; top: 0; width: 100vw; height: 100vh; overflow: hidden;
+  position: fixed;
+  z-index: 0;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
 }
 .background-video video {
-  width: 100vw; height: 100vh; object-fit: cover;
-  filter: brightness(0.75) blur(0.2px) saturate(1.09);
-  position: absolute; top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  min-width: 100%;
+  min-height: 100%;
+  filter: blur(2px) brightness(0.89) saturate(1.06);
+  position: absolute;
+  top: 0; left: 0;
 }
 .bg-overlay {
-  position: absolute; width: 100vw; height: 100vh; top: 0; left: 0; z-index: 2;
-  background: linear-gradient(120deg, #ffe8f6cc 40%, #c6f0ffd8 100%);
-  pointer-events: none;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0; left: 0;
+  background: linear-gradient(135deg, #ffdee9bb 0%, #b5fffcbb 100%);
+  z-index: 1;
 }
 
 .container {
-  max-width: 410px;
-  margin: 6vw auto 0 auto;
-  background: rgba(255,255,255,0.97);
+  position: relative;
+  z-index: 10;
+  max-width: 420px;
+  margin: 7vw auto 0 auto;
+  background: rgba(255,255,255,0.99);
   padding: 29px 4vw 18px 4vw;
   border-radius: 20px;
   box-shadow: 0 3px 24px #eab5e799;
-  position: relative;
   backdrop-filter: blur(1.2px);
-  z-index: 3;
+  animation: appear 0.6s;
+}
+@keyframes appear { from { opacity:0; transform: translateY(44px);} to {opacity:1; transform:none;} }
+
+.subtitle {
+  text-align: center;
+  color: #b46d9a;
+  font-size: 16px;
+  margin-bottom: 12px;
+  margin-top: -7px;
+  font-weight: 500;
 }
 @media (max-width: 600px) {
   .container {
@@ -45,16 +70,7 @@ body {
     min-height: 100vh;
   }
 }
-.subtitle {
-  text-align: center;
-  color: #b46d9a;
-  font-size: 16px;
-  margin-bottom: 12px;
-  margin-top: -7px;
-  font-weight: 500;
-}
 
-/* Pink label everywhere */
 label, .pink-label {
   display: block;
   margin-top: 15px;
@@ -82,7 +98,6 @@ select:focus, input[type="password"]:focus {
   color: #ea6fbd;
 }
 
-/* Toolbar */
 .toolbar {
   display: flex;
   align-items: center;
@@ -109,12 +124,8 @@ select:focus, input[type="password"]:focus {
   background: #ffbde2;
   color: #ea6fbd;
 }
-#fontSelect {
-  width: 70px;
-  min-width: 70px;
-}
+#fontSelect { width: 70px; min-width: 70px; }
 
-/* Vent Area */
 .vent-area {
   width: 100%;
   min-height: 82px;
@@ -154,10 +165,7 @@ select:focus, input[type="password"]:focus {
   letter-spacing: 0.6px;
   box-shadow: 0 2px 10px #f6b3e422;
   transition: background .18s, box-shadow .17s;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  display: flex;
+  display: block;
 }
 .big-btn:hover, .vault-btn:hover, .comfort-btn:hover, .back-btn:hover {
   background: linear-gradient(90deg,#e867a1 10%,#d9a7e2 90%);
@@ -167,10 +175,9 @@ select:focus, input[type="password"]:focus {
   background: linear-gradient(90deg,#ffb6c1 10%,#ea94d3 90%);
   margin-top: 13px;
   font-weight: 700;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: #fff !important;
+  width: 100%;
+  display: block;
 }
 .delete-btn:hover {
   background: linear-gradient(90deg,#f67fa7 10%,#b663b3 90%);
@@ -184,7 +191,23 @@ select:focus, input[type="password"]:focus {
   line-height: 1.3;
 }
 
-/* Loader Ribbon Centered Modal */
+.flash-message {
+  background: linear-gradient(90deg,#fff5fc 70%,#d2f7fd 100%);
+  color: #e678bb;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 8px;
+  margin-top: -14px;
+  margin-bottom: 12px;
+  font-size: 15.6px;
+  padding: 10px 13px;
+  box-shadow: 0 1px 8px #fa8dc022;
+  display: none;
+  animation: flashin .5s;
+  z-index: 9999;
+}
+@keyframes flashin { from {opacity: 0;} to {opacity: 1;} }
+
 .center-modal {
   display: none;
   align-items: center;
@@ -197,9 +220,7 @@ select:focus, input[type="password"]:focus {
   height: 100vh;
   background: rgba(255, 202, 232, 0.19);
 }
-.center-modal.active {
-  display: flex !important;
-}
+.center-modal.active { display: flex !important; }
 .ribbon-loader-box, .custom-modal .modal-content, .modal-content.glassy-modal {
   background: linear-gradient(115deg, #fff0f9 0%, #ffe6fa 100%) !important;
   border: 2px solid #ffbde2;
@@ -249,6 +270,7 @@ select:focus, input[type="password"]:focus {
   100% { transform: rotate(360deg);}
 }
 
+/* Custom Modal Alert */
 .custom-modal .modal-content, .center-modal .modal-content {
   border-radius: 14px;
   padding: 22px 17px 12px 17px;
@@ -261,10 +283,6 @@ select:focus, input[type="password"]:focus {
   color: #ea6fbd;
   position: relative;
   line-height: 1.36;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 @media (max-width: 600px) {
   .custom-modal .modal-content, .center-modal .modal-content {
@@ -284,11 +302,8 @@ select:focus, input[type="password"]:focus {
   top: 10px; right: 13px;
   transition: color .13s;
 }
-.close-button:hover {
-  color: #e567a8;
-}
+.close-button:hover { color: #e567a8; }
 
-/* Vault Cards & Menus */
 .vault-list-title {
   font-size: 16px;
   font-weight: 800;
@@ -325,6 +340,7 @@ select:focus, input[type="password"]:focus {
 .vault-card-content {
   flex: 1 1 0;
   min-width: 0;
+  cursor: pointer;
 }
 .vault-card-header {
   font-weight: 800;
@@ -334,7 +350,9 @@ select:focus, input[type="password"]:focus {
   letter-spacing: .2px;
   word-break: break-word;
   white-space: normal;
+  transition: color 0.12s;
 }
+.vault-card-header:hover { color: #e567a8; text-decoration: underline; cursor: pointer; }
 
 .menu-dots {
   background: none;
@@ -380,23 +398,8 @@ select:focus, input[type="password"]:focus {
   margin: 0;
   transition: background .13s;
 }
-.menu-popup button:last-child {
-  border-bottom: none;
-}
-.menu-popup button:hover {
-  background: #ffe7f6;
-  color: #d83a99;
-}
-.menu-backdrop {
-  display: none;
-  position: fixed;
-  z-index: 10000;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: transparent;
-}
-.menu-popup[style*="display: block"] ~ .menu-backdrop {
-  display: block;
-}
+.menu-popup button:last-child { border-bottom: none; }
+.menu-popup button:hover { background: #ffe7f6; color: #d83a99; }
 
 /* Activities/Comfort Corner */
 .comfort-content {
@@ -424,6 +427,7 @@ select:focus, input[type="password"]:focus {
   color: #c34d8a;
   font-weight: 800;
   box-shadow: 0 2px 8px #ffc3e76b;
+  transition: background .16s, color .15s;
 }
 .activity-btn:hover {
   background: linear-gradient(90deg,#e6b1ff 10%,#fa97bc 90%);
@@ -454,14 +458,13 @@ select:focus, input[type="password"]:focus {
 }
 
 /* Cat Modal */
-.cat-content {
-  padding-top: 7px;
-}
+.cat-content { padding-top: 7px; }
 #theCat {
   width: 82px; height: 82px; margin: 0 auto;
   background: none;
   user-select: none;
   cursor: pointer;
+  display: block;
 }
 .cat-msg {
   font-size: 14px;
@@ -471,39 +474,39 @@ select:focus, input[type="password"]:focus {
   min-height: 18px;
 }
 
-/* Affirmation heart floating */
-.affirm-heart {
+/* Affirmation Hearts (gentle messages) */
+.affirmation-heart {
   position: fixed;
   z-index: 15000;
-  background: linear-gradient(120deg, #ffd7ec 0%, #c1f7f9 100%);
-  color: #d83a99;
-  padding: 9px 19px 10px 19px;
-  border-radius: 50px;
-  font-weight: 800;
-  font-family: 'Pacifico', 'Quicksand', cursive;
-  font-size: 17px;
-  opacity: 0.93;
-  box-shadow: 0 2px 9px #ffe7f68a;
-  left: 50vw;
-  top: -38px;
+  background: linear-gradient(110deg,#ffd6ec 20%,#b5fffc 100%);
+  color: #e053bb;
+  padding: 17px 25px 15px 25px;
+  border-radius: 30px 30px 38px 38px/31px 31px 46px 46px;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 2px 18px #ffbde29c;
+  left: 48vw;
+  top: -60px;
+  opacity: 0.92;
   pointer-events: auto;
+  transition: box-shadow 0.12s, opacity 0.13s, transform 0.13s;
   user-select: none;
   cursor: pointer;
-  transition: box-shadow 0.12s, opacity 0.13s, transform 0.13s;
-  animation: heartPop 0.19s cubic-bezier(.23,1.03,.73,1.13);
+  animation: popHeart 0.18s cubic-bezier(.23,1.03,.73,1.13);
+  text-shadow: 0 2px 10px #fff9;
+  border: 2.5px solid #fa8dc0a0;
 }
-.affirm-heart.popped {
+.affirmation-heart.popped {
   opacity: 0 !important;
-  transform: scale(1.11) rotate(-10deg) !important;
+  transform: scale(1.13) rotate(-12deg) !important;
   box-shadow: none !important;
   transition: opacity 0.13s, transform 0.13s;
 }
-@keyframes heartPop {
-  from { transform: scale(0.79);}
+@keyframes popHeart {
+  from { transform: scale(0.78);}
   to { transform: scale(1);}
 }
 
-/* Countdown cards */
 .countdowns {
   display: flex;
   gap: 8px;
@@ -537,11 +540,13 @@ select:focus, input[type="password"]:focus {
   min-height: 17px;
 }
 @media (max-width: 600px) {
-  .countdowns { flex-direction: column; gap: 7px; }
+  .countdowns {
+    flex-direction: column;
+    gap: 7px;
+  }
   .countdown-card { min-width: unset; }
 }
 
-/* Modal Letter */
 .modal {
   display: none;
   position: fixed;
@@ -563,10 +568,6 @@ select:focus, input[type="password"]:focus {
   animation: slideUpModal .18s cubic-bezier(.6,1.2,.7,1.08);
   position: relative;
   backdrop-filter: blur(1.2px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 @media (max-width: 600px) {
   .modal-content.glassy-modal {
