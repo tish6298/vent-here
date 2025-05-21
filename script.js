@@ -12,10 +12,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // --- Custom Modal Alert ---
-function showCustomModal(msg) {
+function showCustomModal(msg, withOK = true) {
   const modal = document.getElementById('customModal');
   if (modal) {
-    modal.innerHTML = `<div class="modal-content glassy-modal">${msg}</div>`;
+    modal.innerHTML = `<div class="modal-content">${msg}${withOK ? `<br><br><button onclick="closeCustomModal()" class="big-btn" style="width:90%;margin-top:15px;">OK</button>` : ''}</div>`;
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
   } else {
@@ -50,10 +50,21 @@ function submitVent() {
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal(`
-      <span>Type a little more? I want to hear you.</span><br><br>
-      <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">OK</button>
-    `);
+    showCustomModal(
+      `<span>Type a little more? I want to hear you.</span>`,
+      false
+    );
+    setTimeout(() => {
+      const modal = document.getElementById('customModal');
+      if (modal) {
+        modal.onclick = (e) => {
+          if (e.target.classList.contains('modal-content') || e.target.classList.contains('custom-modal')) {
+            closeCustomModal();
+            modal.onclick = null;
+          }
+        };
+      }
+    }, 10);
     return;
   }
 
@@ -81,12 +92,12 @@ function submitVent() {
         loading.classList.remove("active");
         document.body.style.overflow = "";
         ventElem.innerHTML = '';
-        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
+        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗");
       }, 800);
     }).catch(err => {
       loading.classList.remove("active");
       document.body.style.overflow = "";
-      showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small><br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
+      showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small>");
     });
   });
 }
@@ -125,7 +136,35 @@ function decryptText(base64, password) {
   });
 }
 
-// --- VAULT ACCESS & VAULT CARDS ---
+// --- VAULT ACCESS ---
+function unlockVault() {
+  const inputElem = document.getElementById("vaultPassword");
+  const loader = document.getElementById("vaultLoader");
+  const circ = document.getElementById("vaultRibbonCirc");
+  if (!inputElem) return;
+  const inputPassword = inputElem.value;
+  if (inputPassword !== "tishcancode") {
+    showCustomModal("That’s not our secret word… try again?");
+    return;
+  }
+  if (loader) {
+    loader.classList.add("active");
+    if (circ) circ.classList.remove("done");
+    document.body.style.overflow = "hidden";
+  }
+  setTimeout(()=>{
+    if (circ) circ.classList.add("done");
+    setTimeout(()=>{
+      loader.classList.remove("active");
+      document.body.style.overflow = "";
+      document.getElementById("passwordPrompt").style.display = "none";
+      document.getElementById("vaultSection").style.display = "block";
+      loadVaultEntries(inputPassword);
+    }, 700);
+  }, 800);
+}
+window.unlockVault = unlockVault;
+
 function loadVaultEntries(password) {
   const list = document.getElementById("ventList");
   if (!list) return;
@@ -150,8 +189,6 @@ function createVaultCard(data, docId) {
   const card = document.createElement("div");
   card.className = "vault-card";
   card.dataset.docId = docId;
-
-  // Main content
   const contentDiv = document.createElement("div");
   contentDiv.className = "vault-card-content";
   const header = document.createElement("div");
@@ -164,7 +201,6 @@ function createVaultCard(data, docId) {
   menuBtn.className = "menu-dots";
   menuBtn.innerHTML = "&#x22EE;";
   menuBtn.title = "More";
-
   const menuPopup = document.createElement("div");
   menuPopup.className = "menu-popup";
   menuPopup.style.display = "none";
@@ -173,7 +209,6 @@ function createVaultCard(data, docId) {
     <button class="menu-download">Download</button>
     <button class="menu-delete">Delete</button>
   `;
-
   menuPopup.querySelector(".menu-read").onclick = e => {
     showModal(data.fullText);
     menuPopup.style.display = "none";
@@ -194,7 +229,6 @@ function createVaultCard(data, docId) {
     document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
   };
-
   menuBtn.onclick = function(e) {
     document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
     document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
@@ -219,45 +253,50 @@ function createVaultCard(data, docId) {
       backdrop.style.display = "none";
     };
   }
-  document.addEventListener("click", function(e) {
-    if (menuPopup.style.display === "block" && 
-        !menuPopup.contains(e.target) && 
-        !menuBtn.contains(e.target)) {
-      menuPopup.style.display = "none";
-      menuBtn.classList.remove("active");
-      const backdrop = document.getElementById("menuBackdrop");
-      if (backdrop) backdrop.style.display = "none";
-    }
-  });
-
+  // Proper document click close (only one event listener, per menu)
+  if (!menuPopup._clickListener) {
+    menuPopup._clickListener = function(e) {
+      if (menuPopup.style.display === "block" && 
+          !menuPopup.contains(e.target) && 
+          !menuBtn.contains(e.target)) {
+        menuPopup.style.display = "none";
+        menuBtn.classList.remove("active");
+        const backdrop = document.getElementById("menuBackdrop");
+        if (backdrop) backdrop.style.display = "none";
+      }
+    };
+    document.addEventListener("click", menuPopup._clickListener);
+  }
   card.appendChild(contentDiv);
   card.appendChild(menuBtn);
   card.appendChild(menuPopup);
   return card;
 }
 
+// --- Themed Delete Confirm Modal ---
 function showDeleteConfirm(docId) {
-  showCustomModal(`
-    <span>Are you sure you want to delete this memory?</span><br><br>
-    <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>
-    <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>
-  `);
+  showCustomModal(
+    `<span>Are you sure you want to delete this memory?</span><br><br>
+     <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>
+     <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>`,
+    false
+  );
 }
-
 window.confirmDeleteSingle = function(docId) {
   closeCustomModal();
   db.collection("nayuVault").doc(docId).delete().then(() => {
-    showCustomModal("Deleted! I’m always here for your next note.<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
-    setTimeout(()=>location.reload(),1300);
+    showCustomModal("Deleted! I’m always here for your next note.");
+    setTimeout(()=>location.reload(),1200);
   }).catch(err => showCustomModal("Error deleting: " + err.message));
 };
 
 function deleteAllVents() {
-  showCustomModal(`
-    <span>Are you sure you want to delete all your memories? This can’t be undone.</span><br><br>
-    <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteAll()">Yes, delete all</button>
-    <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>
-  `);
+  showCustomModal(
+    `<span>Are you sure you want to delete all your memories? This can’t be undone.</span><br><br>
+     <button onclick='confirmDeleteAll()' class='delete-btn'>Yes, delete all</button>
+     <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>`,
+    false
+  );
 }
 window.deleteAllVents = deleteAllVents;
 window.deleteAllEntries = deleteAllVents;
@@ -269,7 +308,7 @@ function confirmDeleteAll() {
     querySnapshot.forEach((doc) => batch.delete(doc.ref));
     return batch.commit();
   }).then(() => {
-    showCustomModal("Everything deleted. I’ll be here for your next secret anytime.<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
+    showCustomModal("Everything deleted. I’ll be here for your next secret anytime.");
     setTimeout(()=>location.reload(),1200);
   }).catch(err => showCustomModal("Error deleting: " + err.message));
 }
@@ -309,6 +348,12 @@ function downloadText(content, filename) {
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
   }, 110);
+}
+if (document.getElementById("vaultPassword")) {
+  document.getElementById("vaultPassword")
+    .addEventListener("keyup", e => {
+      if (e.key === "Enter") unlockVault();
+    });
 }
 
 // --- Activities / Games ---
@@ -361,7 +406,6 @@ function complimentRain() {
         {top:end+"vh", opacity:1, transform:"scale(1.17)"},
         {top:end+"vh", opacity:0, transform:"scale(1.26)"}
       ], {duration:rainDuration, easing:"ease-in"});
-      // popping interaction
       el.onclick = () => {
         el.classList.add("popped");
         setTimeout(()=>{if(el)el.remove();}, 250);
@@ -369,7 +413,6 @@ function complimentRain() {
       setTimeout(()=>{if(el)el.remove();}, rainDuration+160);
     }, i*300);
   }
-  // Prevent button spam:
   document.body.style.pointerEvents = "none";
   setTimeout(() => { document.body.style.pointerEvents = ""; }, complimentCount * 300 + rainDuration + 200);
 }
