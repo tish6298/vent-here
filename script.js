@@ -50,9 +50,28 @@ function submitVent() {
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal("Type a little more? I want to hear you.");
+    showCustomModal(`<span>Type a little more? I want to hear you.</span><br><br>
+      <button class="ok-btn" style="margin-top:8px;width:80%;">OK</button>`);
+    // Add this handler to close popups and backdrop on OK
+    setTimeout(() => {
+      const okBtn = document.querySelector('.ok-btn');
+      if (okBtn) {
+        okBtn.onclick = function() {
+          // Close all open menu popups
+          document.querySelectorAll(".menu-popup").forEach(m => m.style.display = "none");
+          // Remove active state from dots
+          document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
+          // Hide backdrop if it exists
+          const backdrop = document.getElementById("menuBackdrop");
+          if (backdrop) backdrop.style.display = "none";
+        }
+      }
+    }, 10);
     return;
   }
+  // ...rest of your submitVent logic here...
+}
+
   // Show loader modal
   const loading = document.getElementById("loadingCard");
   const circ = document.getElementById("mainRibbonCirc");
