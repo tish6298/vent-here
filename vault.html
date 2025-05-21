@@ -2,44 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Nayu’s Cozy Corner 🌷</title>
+  <title>The Heart Vault 🌷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="background-video">
-    <video autoplay muted loop playsinline id="bgvid">
-      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.webm" type="video/webm">
-      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.mp4" type="video/mp4">
+    <video autoplay loop muted playsinline poster="" id="bgvid">
+      <source src="https://www.w3schools.com/howto/rain.mp4" type="video/mp4">
     </video>
     <div class="bg-overlay"></div>
   </div>
-  <div class="container" style="max-width: 480px;">
-    <h1>Tish’s Vault 💗</h1>
-    <div id="passwordPrompt" class="vault-list-title">
-      <label for="vaultPassword" class="pink-label" style="margin-bottom:7px;">Type the secret word:</label>
-      <input type="password" id="vaultPassword" class="themed-input" placeholder="Secret...">
-      <button class="big-btn" style="margin-top:14px;" onclick="unlockVault()">Unlock</button>
+  <div class="container">
+    <h1>The Heart Vault</h1>
+    <div class="subtitle">Only you can unlock this secret garden.</div>
+    <div id="passwordPrompt">
+      <input type="password" class="themed-input" id="vaultPassword" placeholder="Type the secret word…">
+      <button class="vault-btn" onclick="unlockVault()">Unlock</button>
     </div>
     <div id="vaultLoader" class="center-modal">
       <div class="ribbon-loader-box">
-        <div class="ribbon">Opening the heart vault...</div>
+        <div class="ribbon">Opening your vault...</div>
         <div class="ribbon-loader-circ" id="vaultRibbonCirc"></div>
       </div>
     </div>
-    <div id="vaultSection" style="display:none;">
+    <div id="customModal" class="custom-modal"></div>
+    <section id="vaultSection" style="display:none;">
       <div class="vault-list-title">Your memories</div>
       <div class="vault-list" id="ventList"></div>
-      <button class="delete-btn" onclick="deleteAllVents()" style="margin-top:19px;">Delete ALL (be careful)</button>
+      <button class="delete-btn" onclick="deleteAllVents()">Delete ALL (be careful)</button>
       <button class="back-btn" onclick="window.location.href='index.html'">Back to Home</button>
-    </div>
-    <div id="customModal" class="custom-modal"></div>
-    <div id="menuBackdrop" class="menu-backdrop"></div>
-    <div id="previewModal" class="modal">
+    </section>
+    <div id="menuBackdrop" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:1000;background:transparent;"></div>
+    <div id="previewModal" class="modal" style="display:none;">
       <div class="modal-content glassy-modal">
         <span class="close-button" id="closeModal">&times;</span>
-        <div class="preview-header">Memory</div>
+        <div class="preview-header">Your Note</div>
         <div class="preview-body" id="modalText"></div>
       </div>
     </div>
