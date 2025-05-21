@@ -5,18 +5,22 @@
   <title>Nayu’s Cozy Corner 🌷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Background Video & Overlay -->
   <div class="background-video">
-    <video autoplay loop muted playsinline poster="" id="bgvid">
-      <source src="https://www.w3schools.com/howto/rain.mp4" type="video/mp4">
+    <video autoplay muted loop playsinline poster="fallback.jpg" id="bgVid">
+      <source src="https://cdn.pixabay.com/video/2023/06/26/170557-836290954_large.mp4" type="video/mp4">
+      <!-- Replace with any calm, pretty video of your choice. This is a soft clouds video from Pixabay. -->
     </video>
     <div class="bg-overlay"></div>
   </div>
+
   <div class="container">
     <h1>Hi baby, tell me anything 💗</h1>
     <div class="subtitle">Your words are safe here, with Tish. Let it out or pick something comforting below!</div>
-    <div class="flash-message" id="flashMessage"></div>
     <div class="countdowns">
       <div class="countdown-card" id="nayuBday">
         <div class="countdown-title">Your Birthday</div>
@@ -71,6 +75,23 @@
     <div id="customModal" class="custom-modal"></div>
     <button class="comfort-btn" onclick="window.location.href='comfort.html'">Go to Comfort Corner</button>
   </div>
+
+  <!-- Comfort Modals -->
+  <div id="breathingModal" class="center-modal">
+    <div class="modal-content glassy-modal">
+      <span class="close-button" onclick="closeBreathing()">&times;</span>
+      <div class="breath-circle" id="breathCircle"></div>
+      <div class="breath-instruct" id="breathInstruct">Ready?</div>
+    </div>
+  </div>
+  <div id="catModal" class="center-modal">
+    <div class="modal-content glassy-modal cat-content">
+      <span class="close-button" onclick="closeCat()">&times;</span>
+      <div id="theCat"></div>
+      <div id="catMsg" class="cat-msg"></div>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="script.js"></script>
