@@ -52,7 +52,6 @@ function submitVent() {
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
     showCustomModal(`<span>Type a little more? I want to hear you.</span><br><br>
       <button class="ok-btn" style="margin-top:8px;width:80%;">OK</button>`);
-    // Add this handler to close popups and backdrop on OK
     setTimeout(() => {
       const okBtn = document.querySelector('.ok-btn');
       if (okBtn) {
@@ -64,13 +63,13 @@ function submitVent() {
           // Hide backdrop if it exists
           const backdrop = document.getElementById("menuBackdrop");
           if (backdrop) backdrop.style.display = "none";
+          // Close the modal itself
+          closeCustomModal();
         }
       }
     }, 10);
     return;
   }
-  // ...rest of your submitVent logic here...
-}
 
   // Show loader modal
   const loading = document.getElementById("loadingCard");
@@ -202,81 +201,81 @@ function createVaultCard(data, docId) {
   header.textContent = `${data.date} — [${data.mood}]`;
   contentDiv.appendChild(header);
 
-// Dots Menu
-const menuBtn = document.createElement("button");
-menuBtn.className = "menu-dots";
-menuBtn.innerHTML = "&#x22EE;";
-menuBtn.title = "More";
-const menuPopup = document.createElement("div");
-menuPopup.className = "menu-popup";
-menuPopup.style.display = "none";
-menuPopup.innerHTML = `
-  <button class="menu-read">Read</button>
-  <button class="menu-download">Download</button>
-  <button class="menu-delete">Delete</button>
-`;
-menuPopup.querySelector(".menu-read").onclick = e => {
-  showModal(data.fullText);
+  // Dots Menu
+  const menuBtn = document.createElement("button");
+  menuBtn.className = "menu-dots";
+  menuBtn.innerHTML = "&#x22EE;";
+  menuBtn.title = "More";
+  const menuPopup = document.createElement("div");
+  menuPopup.className = "menu-popup";
   menuPopup.style.display = "none";
-  document.getElementById("menuBackdrop").style.display = "none";
-  e.stopPropagation();
-};
-menuPopup.querySelector(".menu-download").onclick = e => {
-  let safeFilename = `${data.date.replace(/[/:,]/g, "-")} - ${data.mood}.txt`;
-  safeFilename = safeFilename.replace(/[\s?<>\\:*|"]/g, '_');
-  downloadText(data.fullText, safeFilename);
-  menuPopup.style.display = "none";
-  document.getElementById("menuBackdrop").style.display = "none";
-  e.stopPropagation();
-};
-menuPopup.querySelector(".menu-delete").onclick = e => {
-  showCustomModal(`<span>Are you sure you want to delete this memory?</span><br><br><button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>`);
-  menuPopup.style.display = "none";
-  document.getElementById("menuBackdrop").style.display = "none";
-  e.stopPropagation();
-};
-menuBtn.onclick = function(e) {
-  document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
-  document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
-  const backdrop = document.getElementById("menuBackdrop");
-  if (menuPopup.style.display === "block") {
+  menuPopup.innerHTML = `
+    <button class="menu-read">Read</button>
+    <button class="menu-download">Download</button>
+    <button class="menu-delete">Delete</button>
+  `;
+  menuPopup.querySelector(".menu-read").onclick = e => {
+    showModal(data.fullText);
     menuPopup.style.display = "none";
-    menuBtn.classList.remove("active");
-    if (backdrop) backdrop.style.display = "none";
-  } else {
-    menuPopup.style.display = "block";
-    menuBtn.classList.add("active");
-    if (backdrop) backdrop.style.display = "block";
-    menuPopup.style.left = "auto";
-  }
-  e.stopPropagation();
-};
-const backdrop = document.getElementById("menuBackdrop");
-if (backdrop) {
-  backdrop.onclick = function() {
-    document.querySelectorAll(".menu-popup").forEach(m => m.style.display="none");
-    document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
-    backdrop.style.display = "none";
+    document.getElementById("menuBackdrop").style.display = "none";
+    e.stopPropagation();
   };
-}
-
-// NEW: Document click to close menu if clicked outside
-document.addEventListener("click", function(e) {
-  // Only close if popup is open and the click is NOT inside the menuPopup or menuBtn
-  if (menuPopup.style.display === "block" && 
-      !menuPopup.contains(e.target) && 
-      !menuBtn.contains(e.target)) {
+  menuPopup.querySelector(".menu-download").onclick = e => {
+    let safeFilename = `${data.date.replace(/[/:,]/g, "-")} - ${data.mood}.txt`;
+    safeFilename = safeFilename.replace(/[\s?<>\\:*|"]/g, '_');
+    downloadText(data.fullText, safeFilename);
     menuPopup.style.display = "none";
-    menuBtn.classList.remove("active");
+    document.getElementById("menuBackdrop").style.display = "none";
+    e.stopPropagation();
+  };
+  menuPopup.querySelector(".menu-delete").onclick = e => {
+    showCustomModal(`<span>Are you sure you want to delete this memory?</span><br><br><button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>`);
+    menuPopup.style.display = "none";
+    document.getElementById("menuBackdrop").style.display = "none";
+    e.stopPropagation();
+  };
+  menuBtn.onclick = function(e) {
+    document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
+    document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
     const backdrop = document.getElementById("menuBackdrop");
-    if (backdrop) backdrop.style.display = "none";
+    if (menuPopup.style.display === "block") {
+      menuPopup.style.display = "none";
+      menuBtn.classList.remove("active");
+      if (backdrop) backdrop.style.display = "none";
+    } else {
+      menuPopup.style.display = "block";
+      menuBtn.classList.add("active");
+      if (backdrop) backdrop.style.display = "block";
+      menuPopup.style.left = "auto";
+    }
+    e.stopPropagation();
+  };
+  const backdrop = document.getElementById("menuBackdrop");
+  if (backdrop) {
+    backdrop.onclick = function() {
+      document.querySelectorAll(".menu-popup").forEach(m => m.style.display="none");
+      document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
+      backdrop.style.display = "none";
+    };
   }
-});
 
-card.appendChild(contentDiv);
-card.appendChild(menuBtn);
-card.appendChild(menuPopup);
-return card;
+  // NEW: Document click to close menu if clicked outside
+  document.addEventListener("click", function(e) {
+    if (menuPopup.style.display === "block" && 
+        !menuPopup.contains(e.target) && 
+        !menuBtn.contains(e.target)) {
+      menuPopup.style.display = "none";
+      menuBtn.classList.remove("active");
+      const backdrop = document.getElementById("menuBackdrop");
+      if (backdrop) backdrop.style.display = "none";
+    }
+  });
+
+  card.appendChild(contentDiv);
+  card.appendChild(menuBtn);
+  card.appendChild(menuPopup);
+  return card;
+}
 
 window.confirmDeleteSingle = function(docId) {
   closeCustomModal();
