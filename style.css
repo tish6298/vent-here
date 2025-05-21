@@ -172,7 +172,8 @@ select:focus, input[type="password"]:focus {
   justify-content: center;
   position: fixed;
   z-index: 50000;
-  top: 0; left: 0;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
   width: 100vw;
   height: 100vh;
   background: rgba(255, 202, 232, 0.19);
