@@ -15,7 +15,7 @@ const db = firebase.firestore();
 function showCustomModal(msg) {
   const modal = document.getElementById('customModal');
   if (modal) {
-    modal.querySelector('.modal-content').innerHTML = msg + '<br><br><button onclick="closeCustomModal()" class="big-btn" style="width:90%;margin-top:15px;">OK</button>';
+    modal.innerHTML = `<div class="modal-content glassy-modal">${msg}</div>`;
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
   } else {
@@ -50,24 +50,10 @@ function submitVent() {
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal(`<span>Type a little more? I want to hear you.</span><br><br>
-      <button class="ok-btn" style="margin-top:8px;width:80%;">OK</button>`);
-    setTimeout(() => {
-      const okBtn = document.querySelector('.ok-btn');
-      if (okBtn) {
-        okBtn.onclick = function() {
-          // Close all open menu popups
-          document.querySelectorAll(".menu-popup").forEach(m => m.style.display = "none");
-          // Remove active state from dots
-          document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
-          // Hide backdrop if it exists
-          const backdrop = document.getElementById("menuBackdrop");
-          if (backdrop) backdrop.style.display = "none";
-          // Close the modal itself
-          closeCustomModal();
-        }
-      }
-    }, 10);
+    showCustomModal(`
+      <span>Type a little more? I want to hear you.</span><br><br>
+      <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">OK</button>
+    `);
     return;
   }
 
@@ -95,12 +81,12 @@ function submitVent() {
         loading.classList.remove("active");
         document.body.style.overflow = "";
         ventElem.innerHTML = '';
-        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗");
+        showCustomModal("Your words are safe with me now. Thank you for trusting me with your heart. 💗<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
       }, 800);
     }).catch(err => {
       loading.classList.remove("active");
       document.body.style.overflow = "";
-      showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small>");
+      showCustomModal("Something went wrong saving your vent. <br><small>" + err.message + "</small><br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
     });
   });
 }
@@ -139,36 +125,7 @@ function decryptText(base64, password) {
   });
 }
 
-// --- VAULT ACCESS ---
-function unlockVault() {
-  const inputElem = document.getElementById("vaultPassword");
-  const loader = document.getElementById("vaultLoader");
-  const circ = document.getElementById("vaultRibbonCirc");
-  if (!inputElem) return;
-  const inputPassword = inputElem.value;
-  if (inputPassword !== "tishcancode") {
-    showCustomModal("That’s not our secret word… try again?");
-    return;
-  }
-  // Show loader
-  if (loader) {
-    loader.classList.add("active");
-    if (circ) circ.classList.remove("done");
-    document.body.style.overflow = "hidden";
-  }
-  setTimeout(()=>{
-    if (circ) circ.classList.add("done");
-    setTimeout(()=>{
-      loader.classList.remove("active");
-      document.body.style.overflow = "";
-      document.getElementById("passwordPrompt").style.display = "none";
-      document.getElementById("vaultSection").style.display = "block";
-      loadVaultEntries(inputPassword);
-    }, 700);
-  }, 800);
-}
-window.unlockVault = unlockVault;
-
+// --- VAULT ACCESS & VAULT CARDS ---
 function loadVaultEntries(password) {
   const list = document.getElementById("ventList");
   if (!list) return;
@@ -193,6 +150,7 @@ function createVaultCard(data, docId) {
   const card = document.createElement("div");
   card.className = "vault-card";
   card.dataset.docId = docId;
+
   // Main content
   const contentDiv = document.createElement("div");
   contentDiv.className = "vault-card-content";
@@ -206,6 +164,7 @@ function createVaultCard(data, docId) {
   menuBtn.className = "menu-dots";
   menuBtn.innerHTML = "&#x22EE;";
   menuBtn.title = "More";
+
   const menuPopup = document.createElement("div");
   menuPopup.className = "menu-popup";
   menuPopup.style.display = "none";
@@ -214,6 +173,7 @@ function createVaultCard(data, docId) {
     <button class="menu-download">Download</button>
     <button class="menu-delete">Delete</button>
   `;
+
   menuPopup.querySelector(".menu-read").onclick = e => {
     showModal(data.fullText);
     menuPopup.style.display = "none";
@@ -229,11 +189,12 @@ function createVaultCard(data, docId) {
     e.stopPropagation();
   };
   menuPopup.querySelector(".menu-delete").onclick = e => {
-    showCustomModal(`<span>Are you sure you want to delete this memory?</span><br><br><button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>`);
+    showDeleteConfirm(docId);
     menuPopup.style.display = "none";
     document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
   };
+
   menuBtn.onclick = function(e) {
     document.querySelectorAll(".menu-popup").forEach(m => { if (m!==menuPopup) m.style.display="none"; });
     document.querySelectorAll(".menu-dots").forEach(b => b.classList.remove("active"));
@@ -258,8 +219,6 @@ function createVaultCard(data, docId) {
       backdrop.style.display = "none";
     };
   }
-
-  // NEW: Document click to close menu if clicked outside
   document.addEventListener("click", function(e) {
     if (menuPopup.style.display === "block" && 
         !menuPopup.contains(e.target) && 
@@ -277,16 +236,28 @@ function createVaultCard(data, docId) {
   return card;
 }
 
+function showDeleteConfirm(docId) {
+  showCustomModal(`
+    <span>Are you sure you want to delete this memory?</span><br><br>
+    <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>
+    <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>
+  `);
+}
+
 window.confirmDeleteSingle = function(docId) {
   closeCustomModal();
   db.collection("nayuVault").doc(docId).delete().then(() => {
-    showCustomModal("Deleted! I’m always here for your next note.");
-    setTimeout(()=>location.reload(),1200);
+    showCustomModal("Deleted! I’m always here for your next note.<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
+    setTimeout(()=>location.reload(),1300);
   }).catch(err => showCustomModal("Error deleting: " + err.message));
 };
 
 function deleteAllVents() {
-  showCustomModal("Are you sure you want to delete all your memories? This can’t be undone.<br><br><button onclick='confirmDeleteAll()' class='delete-btn'>Yes, delete all</button>");
+  showCustomModal(`
+    <span>Are you sure you want to delete all your memories? This can’t be undone.</span><br><br>
+    <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteAll()">Yes, delete all</button>
+    <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>
+  `);
 }
 window.deleteAllVents = deleteAllVents;
 window.deleteAllEntries = deleteAllVents;
@@ -298,7 +269,7 @@ function confirmDeleteAll() {
     querySnapshot.forEach((doc) => batch.delete(doc.ref));
     return batch.commit();
   }).then(() => {
-    showCustomModal("Everything deleted. I’ll be here for your next secret anytime.");
+    showCustomModal("Everything deleted. I’ll be here for your next secret anytime.<br><br><button class='big-btn' style='margin-top:8px;width:80%;' onclick='closeCustomModal()'>OK</button>");
     setTimeout(()=>location.reload(),1200);
   }).catch(err => showCustomModal("Error deleting: " + err.message));
 }
@@ -311,16 +282,19 @@ function showModal(text) {
   if (modal && modalText) {
     modalText.innerHTML = text;
     modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
   }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
     document.getElementById("previewModal").style.display = "none";
+    document.body.style.overflow = "";
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
       modal.style.display = "none";
+      document.body.style.overflow = "";
     }
   };
 }
@@ -335,12 +309,6 @@ function downloadText(content, filename) {
     document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
   }, 110);
-}
-if (document.getElementById("vaultPassword")) {
-  document.getElementById("vaultPassword")
-    .addEventListener("keyup", e => {
-      if (e.key === "Enter") unlockVault();
-    });
 }
 
 // --- Activities / Games ---
