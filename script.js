@@ -11,11 +11,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+const vaultPassword = "tishcancode"; // <<--- Change your vault password here!
+
 // --- Custom Modal Alert ---
 function showCustomModal(msg, withOK = true) {
   const modal = document.getElementById('customModal');
   if (modal) {
-    modal.innerHTML = `<div class="modal-content">${msg}${withOK ? `<br><br><button onclick="closeCustomModal()" class="big-btn" style="width:90%;margin-top:15px;">OK</button>` : ''}</div>`;
+    modal.innerHTML = `<div class="modal-content">${msg}${withOK ? `<br><br><button onclick="closeCustomModal()" class="big-btn" style="width:90%;margin-top:15px;display:block;margin-left:auto;margin-right:auto;">OK</button>` : ''}</div>`;
     modal.classList.add("active");
     document.body.style.overflow = "hidden";
   } else {
@@ -50,21 +52,7 @@ function submitVent() {
   const mood = moodElem.value;
   let text = ventElem.innerHTML.trim();
   if (!text || text.replace(/<[^>]*>?/gm, '').trim().length < 2) {
-    showCustomModal(
-      `<span>Type a little more? I want to hear you.</span>`,
-      false
-    );
-    setTimeout(() => {
-      const modal = document.getElementById('customModal');
-      if (modal) {
-        modal.onclick = (e) => {
-          if (e.target.classList.contains('modal-content') || e.target.classList.contains('custom-modal')) {
-            closeCustomModal();
-            modal.onclick = null;
-          }
-        };
-      }
-    }, 10);
+    showCustomModal(`<span>Type a little more? I want to hear you.</span>`);
     return;
   }
 
@@ -76,12 +64,12 @@ function submitVent() {
     if (circ) circ.classList.remove("done");
     document.body.style.overflow = "hidden";
   }
+
   // Save to Firestore (with encryption)
   const date = new Date().toLocaleString();
   const preview = ventElem.innerText.split(" ").slice(0, 18).join(" ") + (ventElem.innerText.split(" ").length > 18 ? "..." : "");
   const entry = { date, mood, preview, fullText: text };
 
-  const vaultPassword = "tishcancode";
   encryptText(JSON.stringify(entry), vaultPassword).then((encrypted) => {
     db.collection("nayuVault").add({
       encrypted,
@@ -143,10 +131,11 @@ function unlockVault() {
   const circ = document.getElementById("vaultRibbonCirc");
   if (!inputElem) return;
   const inputPassword = inputElem.value;
-  if (inputPassword !== "tishcancode") {
+  if (inputPassword !== vaultPassword) {
     showCustomModal("That’s not our secret word… try again?");
     return;
   }
+  // Show loader
   if (loader) {
     loader.classList.add("active");
     if (circ) circ.classList.remove("done");
@@ -189,6 +178,7 @@ function createVaultCard(data, docId) {
   const card = document.createElement("div");
   card.className = "vault-card";
   card.dataset.docId = docId;
+  // Main content
   const contentDiv = document.createElement("div");
   contentDiv.className = "vault-card-content";
   const header = document.createElement("div");
@@ -224,7 +214,7 @@ function createVaultCard(data, docId) {
     e.stopPropagation();
   };
   menuPopup.querySelector(".menu-delete").onclick = e => {
-    showDeleteConfirm(docId);
+    showCustomModal(`<span>Are you sure you want to delete this memory?</span><br><br><button class="delete-btn" style="margin-top:8px;width:80%;display:block;margin-left:auto;margin-right:auto;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>`);
     menuPopup.style.display = "none";
     document.getElementById("menuBackdrop").style.display = "none";
     e.stopPropagation();
@@ -253,35 +243,24 @@ function createVaultCard(data, docId) {
       backdrop.style.display = "none";
     };
   }
-  // Proper document click close (only one event listener, per menu)
-  if (!menuPopup._clickListener) {
-    menuPopup._clickListener = function(e) {
-      if (menuPopup.style.display === "block" && 
-          !menuPopup.contains(e.target) && 
-          !menuBtn.contains(e.target)) {
-        menuPopup.style.display = "none";
-        menuBtn.classList.remove("active");
-        const backdrop = document.getElementById("menuBackdrop");
-        if (backdrop) backdrop.style.display = "none";
-      }
-    };
-    document.addEventListener("click", menuPopup._clickListener);
-  }
+
+  document.addEventListener("click", function(e) {
+    if (menuPopup.style.display === "block" && 
+        !menuPopup.contains(e.target) && 
+        !menuBtn.contains(e.target)) {
+      menuPopup.style.display = "none";
+      menuBtn.classList.remove("active");
+      const backdrop = document.getElementById("menuBackdrop");
+      if (backdrop) backdrop.style.display = "none";
+    }
+  });
+
   card.appendChild(contentDiv);
   card.appendChild(menuBtn);
   card.appendChild(menuPopup);
   return card;
 }
 
-// --- Themed Delete Confirm Modal ---
-function showDeleteConfirm(docId) {
-  showCustomModal(
-    `<span>Are you sure you want to delete this memory?</span><br><br>
-     <button class="delete-btn" style="margin-top:8px;width:80%;" onclick="confirmDeleteSingle('${docId}')">Yes, delete</button>
-     <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>`,
-    false
-  );
-}
 window.confirmDeleteSingle = function(docId) {
   closeCustomModal();
   db.collection("nayuVault").doc(docId).delete().then(() => {
@@ -291,12 +270,7 @@ window.confirmDeleteSingle = function(docId) {
 };
 
 function deleteAllVents() {
-  showCustomModal(
-    `<span>Are you sure you want to delete all your memories? This can’t be undone.</span><br><br>
-     <button onclick='confirmDeleteAll()' class='delete-btn'>Yes, delete all</button>
-     <button class="big-btn" style="margin-top:8px;width:80%;" onclick="closeCustomModal()">Cancel</button>`,
-    false
-  );
+  showCustomModal("Are you sure you want to delete all your memories? This can’t be undone.<br><br><button onclick='confirmDeleteAll()' class='delete-btn' style='margin-left:auto;margin-right:auto;display:block;'>Yes, delete all</button>");
 }
 window.deleteAllVents = deleteAllVents;
 window.deleteAllEntries = deleteAllVents;
@@ -321,19 +295,16 @@ function showModal(text) {
   if (modal && modalText) {
     modalText.innerHTML = text;
     modal.style.display = "flex";
-    document.body.style.overflow = "hidden";
   }
 }
 if (document.getElementById("closeModal")) {
   document.getElementById("closeModal").onclick = function () {
     document.getElementById("previewModal").style.display = "none";
-    document.body.style.overflow = "";
   };
   window.onclick = function (event) {
     const modal = document.getElementById("previewModal");
     if (event.target === modal) {
       modal.style.display = "none";
-      document.body.style.overflow = "";
     }
   };
 }
@@ -355,112 +326,6 @@ if (document.getElementById("vaultPassword")) {
       if (e.key === "Enter") unlockVault();
     });
 }
-
-// --- Activities / Games ---
-function startBreathing() {
-  const modal = document.getElementById("breathingModal");
-  const instruct = document.getElementById("breathInstruct");
-  const circle = document.getElementById("breathCircle");
-  if (!modal) return;
-  modal.classList.add("active");
-  let steps = [
-    {txt:"Breathe In", time: 3500, scale:1.21, color:"#fa8dc0"},
-    {txt:"Hold", time: 2000, scale:1.13, color:"#f7bff0"},
-    {txt:"Breathe Out", time: 4000, scale:0.99, color:"#96d1ea"},
-    {txt:"Hold", time: 1700, scale:1.08, color:"#ffd2ef"}
-  ];
-  let i=0, active=true;
-  function nextStep() {
-    if(!active) return;
-    instruct.textContent = steps[i].txt;
-    circle.style.transition = "all 0.88s cubic-bezier(.6,1.1,.7,1.08)";
-    circle.style.transform = `scale(${steps[i].scale})`;
-    circle.style.background = `linear-gradient(135deg, ${steps[i].color} 50%, #b5fffc 100%)`;
-    setTimeout(() => { i=(i+1)%steps.length; nextStep(); }, steps[i].time);
-  }
-  nextStep();
-  modal.onclick = function(e) { if(e.target===modal){ active=false; modal.classList.remove("active"); } };
-  window.closeBreathing = () => { active=false; modal.classList.remove("active"); };
-}
-window.startBreathing = startBreathing;
-
-function complimentRain() {
-  const compliments = [
-    "You are enough.", "You’re so strong.", "Your feelings are valid.",
-    "You make my world softer.", "I love your heart.", "I’m proud of you.",
-    "It’s okay to rest.", "You shine even on rough days.", "You are loved."
-  ];
-  let complimentCount = 13;
-  let rainDuration = 3300; // ms for the longest bubble
-  for (let i=0; i<complimentCount; ++i) {
-    setTimeout(()=>{
-      let el = document.createElement("div");
-      el.className = "compliment-bubble";
-      el.textContent = compliments[Math.floor(Math.random()*compliments.length)];
-      el.style.left = (8 + Math.random()*82) + "vw";
-      el.style.top = "-50px";
-      document.body.appendChild(el);
-      let end = 100 + Math.random()*15;
-      el.animate([
-        {top:"-50px", opacity:1, transform:"scale(1.05)"},
-        {top:end+"vh", opacity:1, transform:"scale(1.17)"},
-        {top:end+"vh", opacity:0, transform:"scale(1.26)"}
-      ], {duration:rainDuration, easing:"ease-in"});
-      el.onclick = () => {
-        el.classList.add("popped");
-        setTimeout(()=>{if(el)el.remove();}, 250);
-      };
-      setTimeout(()=>{if(el)el.remove();}, rainDuration+160);
-    }, i*300);
-  }
-  document.body.style.pointerEvents = "none";
-  setTimeout(() => { document.body.style.pointerEvents = ""; }, complimentCount * 300 + rainDuration + 200);
-}
-window.complimentRain = complimentRain;
-
-// --- Pet Bixie (cat face) ---
-function petTheCat() {
-  const catModal = document.getElementById("catModal");
-  const theCat = document.getElementById("theCat");
-  const catMsg = document.getElementById("catMsg");
-  if (!catModal || !theCat || !catMsg) return;
-  catModal.classList.add("active");
-  catMsg.textContent = "Tap Bixie to pet!";
-  theCat.innerHTML = `
-    <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
-      <ellipse cx="48" cy="53" rx="38" ry="32" fill="#ffe7c2"/>
-      <ellipse cx="29" cy="43" rx="10" ry="13" fill="#ffb564"/>
-      <ellipse cx="67" cy="43" rx="10" ry="13" fill="#ffb564"/>
-      <ellipse cx="48" cy="53" rx="26" ry="23" fill="#fff7ee"/>
-      <ellipse cx="48" cy="53" rx="16" ry="13" fill="#ffd17b"/>
-      <ellipse cx="48" cy="63" rx="11" ry="7" fill="#ffb564"/>
-      <ellipse cx="43" cy="43" rx="2" ry="4" fill="#ffcf92"/>
-      <ellipse cx="53" cy="43" rx="2" ry="4" fill="#ffcf92"/>
-      <ellipse cx="44" cy="56" rx="2" ry="3" fill="#8e5c26"/>
-      <ellipse cx="52" cy="56" rx="2" ry="3" fill="#8e5c26"/>
-      <ellipse cx="48" cy="59" rx="3" ry="1.2" fill="#fff"/>
-      <ellipse cx="48" cy="61" rx="1.1" ry="0.7" fill="#c97b2b"/>
-      <path d="M46 62 Q48 64,50 62" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
-      <ellipse cx="48" cy="60.5" rx="1.2" ry="1" fill="#c97b2b"/>
-      <path d="M44 51 Q48 56,52 51" stroke="#c97b2b" stroke-width="1.2" fill="none"/>
-      <!-- Ears -->
-      <polygon points="18,28 25,45 31,36" fill="#ffb564"/>
-      <polygon points="78,28 71,45 65,36" fill="#ffb564"/>
-    </svg>
-  `;
-  let purrs = [
-    "Bixie purrs and rubs you!", "She closes her eyes, so happy!", "She loves your gentle touch!", "Bixie does a tiny happy dance."
-  ];
-  let times = 0;
-  theCat.onclick = function() {
-    catMsg.textContent = purrs[times%purrs.length];
-    times++;
-    theCat.style.transform = "scale(1.07)";
-    setTimeout(()=>{theCat.style.transform="";},170);
-  }
-  window.closeCat = ()=>{catModal.classList.remove("active");};
-}
-window.petTheCat = petTheCat;
 
 // === COUNTDOWN TIMERS ===
 function pad(n){return n<10?'0'+n:n;}
