@@ -5,19 +5,18 @@
   <title>Nayu’s Cozy Corner 🌷</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="background-video">
-    <video autoplay muted loop playsinline id="bgvid">
-      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.webm" type="video/webm">
-      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.mp4" type="video/mp4">
+    <video autoplay loop muted playsinline poster="" id="bgvid">
+      <source src="https://www.w3schools.com/howto/rain.mp4" type="video/mp4">
     </video>
     <div class="bg-overlay"></div>
   </div>
   <div class="container">
     <h1>Hi baby, tell me anything 💗</h1>
     <div class="subtitle">Your words are safe here, with Tish. Let it out or pick something comforting below!</div>
+    <div class="flash-message" id="flashMessage"></div>
     <div class="countdowns">
       <div class="countdown-card" id="nayuBday">
         <div class="countdown-title">Your Birthday</div>
@@ -32,6 +31,7 @@
         <div class="countdown-timer" id="countRel"></div>
       </div>
     </div>
+
     <label for="mood" class="pink-label">How are you feeling right now?</label>
     <select id="mood">
       <option value="Overwhelmed">Overwhelmed</option>
@@ -44,6 +44,7 @@
       <option value="Angry">Angry</option>
       <option value="Other">Other</option>
     </select>
+
     <label for="vent" class="pink-label" style="margin-bottom:2px;">I’m listening, type your feelings below:</label>
     <div class="toolbar">
       <button type="button" onclick="formatDoc('bold')" title="Bold"><b>B</b></button>
@@ -60,6 +61,7 @@
     <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="I'll keep it safe for you forever."></div>
     <button class="big-btn" onclick="submitVent()">Send it to Tish’s Vault</button>
     <p class="info love-message">Everything here is private, just for you and me. You’re my favorite person, always. 💖</p>
+    <!-- Loader Modal -->
     <div id="loadingCard" class="center-modal">
       <div class="ribbon-loader-box">
         <div class="ribbon">Sending to your vault...</div>
