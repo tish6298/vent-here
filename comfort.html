@@ -8,30 +8,40 @@
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <h1>Comfort Corner ☁️</h1>
-    <div class="subtitle">Choose something sweet for your heart, anytime you need it.</div>
-    <button class="big-btn" onclick="window.location.href='index.html'">Back to Cozy Corner</button>
-    <div class="comfort-buttons">
-      <button class="comfort-btn" onclick="startBreathing()">Guided Breathing</button>
-      <button class="comfort-btn" onclick="complimentRain()">Compliment Rain</button>
-      <button class="comfort-btn" onclick="petTheCat()">Pet Bixie</button>
+  <div class="background-video">
+    <video autoplay muted loop playsinline id="bgvid">
+      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.webm" type="video/webm">
+      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.mp4" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+  </div>
+  <div class="container comfort-content" style="max-width: 420px;">
+    <h1>Comfort Corner 🌙</h1>
+    <div class="subtitle" style="font-size:16.4px;">Pick a gentle thing to soothe your heart</div>
+    <div class="activities">
+      <button class="activity-btn" onclick="startBreathing()">Breathing Exercise</button>
+      <button class="activity-btn" onclick="affirmationHearts()">Affirmation Hearts</button>
+      <button class="activity-btn" onclick="petTheCat()">Pet Bixie (Cat)</button>
+      <button class="back-btn" onclick="window.location.href='index.html'">Back Home</button>
+    </div>
+    <div id="customModal" class="custom-modal"></div>
+    <!-- Breathing Modal -->
+    <div id="breathingModal" class="center-modal">
+      <div class="modal-content glassy-modal">
+        <span class="close-button" onclick="closeBreathing()">&times;</span>
+        <div class="breath-circle" id="breathCircle"></div>
+        <div class="breath-instruct" id="breathInstruct">Ready?</div>
+      </div>
+    </div>
+    <!-- Cat Modal -->
+    <div id="catModal" class="center-modal">
+      <div class="modal-content glassy-modal cat-content">
+        <span class="close-button" onclick="closeCat()">&times;</span>
+        <div id="theCat"></div>
+        <div id="catMsg" class="cat-msg"></div>
+      </div>
     </div>
   </div>
-  <div id="breathingModal" class="center-modal" tabindex="-1" role="dialog" aria-modal="true">
-    <div class="modal-content glassy-modal">
-      <span class="close-button" onclick="closeBreathing()" tabindex="0" aria-label="Close">&times;</span>
-      <div class="breath-circle" id="breathCircle"></div>
-      <div class="breath-instruct" id="breathInstruct">Ready?</div>
-    </div>
-  </div>
-  <div id="catModal" class="center-modal" tabindex="-1" role="dialog" aria-modal="true">
-    <div class="modal-content glassy-modal cat-content">
-      <span class="close-button" onclick="closeCat()" tabindex="0" aria-label="Close">&times;</span>
-      <div id="theCat"></div>
-      <div id="catMsg" class="cat-msg"></div>
-    </div>
-  </div>
-  <script src="script.js"></script>
+  <script src="comfort.js"></script>
 </body>
 </html>
