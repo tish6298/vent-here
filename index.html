@@ -8,6 +8,14 @@
   <link href="https://fonts.googleapis.com/css?family=Quicksand:700|Pacifico|Caveat|Poppins:600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="background-video">
+    <video autoplay muted loop playsinline id="bgvid">
+      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.webm" type="video/webm">
+      <source src="https://www.videvo.net/videvo_files/converted/2015_08/preview/Clouds_time-lapse_01_Videvo.mp423320.mp4" type="video/mp4">
+      <!-- fallback: -->
+    </video>
+    <div class="bg-overlay"></div>
+  </div>
   <div class="container">
     <h1>Hi baby, tell me anything 💗</h1>
     <div class="subtitle">Your words are safe here, with Tish. Let it out or pick something comforting below!</div>
@@ -53,33 +61,15 @@
     <div id="vent" class="vent-area" contenteditable="true" spellcheck="true" data-placeholder="I'll keep it safe for you forever."></div>
     <button class="big-btn" onclick="submitVent()">Send it to Tish’s Vault</button>
     <p class="info love-message">Everything here is private, just for you and me. You’re my favorite person, always. 💖</p>
-    
     <!-- Loader Modal -->
-    <div id="loadingCard" class="center-modal" aria-modal="true" role="dialog">
+    <div id="loadingCard" class="center-modal">
       <div class="ribbon-loader-box">
         <div class="ribbon">Sending to your vault...</div>
         <div class="ribbon-loader-circ" id="mainRibbonCirc"></div>
       </div>
     </div>
-    <div id="customModal" class="custom-modal" aria-modal="true" role="dialog"></div>
-
-    <button class="vault-btn" onclick="window.location.href='vault.html'">Open The Heart Vault</button>
+    <div id="customModal" class="custom-modal"></div>
     <button class="comfort-btn" onclick="window.location.href='comfort.html'">Go to Comfort Corner</button>
-  </div>
-  <div id="menuBackdrop" class="menu-backdrop"></div>
-  <div id="breathingModal" class="center-modal" tabindex="-1" role="dialog" aria-modal="true">
-    <div class="modal-content glassy-modal">
-      <span class="close-button" onclick="closeBreathing()" tabindex="0" aria-label="Close">&times;</span>
-      <div class="breath-circle" id="breathCircle"></div>
-      <div class="breath-instruct" id="breathInstruct">Ready?</div>
-    </div>
-  </div>
-  <div id="catModal" class="center-modal" tabindex="-1" role="dialog" aria-modal="true">
-    <div class="modal-content glassy-modal cat-content">
-      <span class="close-button" onclick="closeCat()" tabindex="0" aria-label="Close">&times;</span>
-      <div id="theCat"></div>
-      <div id="catMsg" class="cat-msg"></div>
-    </div>
   </div>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
